@@ -26,7 +26,6 @@ services:
       - "9000"
     networks:
       - flux-network
-
   db:
     image: mariadb:10.11
     container_name: flux-payments-db
