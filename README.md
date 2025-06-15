@@ -184,17 +184,7 @@ curl -X POST http://localhost:8080/api/v1/transfer \
 docker exec -it flux-payments-app composer test
 ```
 
-### Análise de Código
-```bash
-# PHPStan (análise estática)
-docker exec -it flux-payments-app composer phpstan
-
-# Code Sniffer (padrões de código)
-docker exec -it flux-payments-app composer phpcs
-```
-
 ### Estrutura do Banco de Dados
-
 O sistema utiliza MariaDB com as seguintes tabelas principais:
 
 - `users` - Dados dos usuários
