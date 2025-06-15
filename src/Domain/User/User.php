@@ -5,43 +5,88 @@ declare(strict_types=1);
 namespace App\Domain\User;
 
 use JsonSerializable;
+use DateTime;
 
 class User implements JsonSerializable
 {
+    public const TYPE_COMMON = 'COMMON';
+    public const TYPE_MERCHANT = 'MERCHANT';
+
     private ?int $id;
+    private string $fullName;
+    private string $cpfCnpj;
+    private string $email;
+    private string $password;
+    private string $type;
+    private DateTime $createdAt;
+    private DateTime $updatedAt;
 
-    private string $username;
-
-    private string $firstName;
-
-    private string $lastName;
-
-    public function __construct(?int $id, string $username, string $firstName, string $lastName)
-    {
+    public function __construct(
+        ?int $id,
+        string $fullName,
+        string $cpfCnpj,
+        string $email,
+        string $password,
+        string $type = self::TYPE_COMMON,
+        ?DateTime $createdAt = null,
+        ?DateTime $updatedAt = null
+    ) {
         $this->id = $id;
-        $this->username = strtolower($username);
-        $this->firstName = ucfirst($firstName);
-        $this->lastName = ucfirst($lastName);
-    }
-
-    public function getId(): ?int
+        $this->fullName = $fullName;
+        $this->cpfCnpj = $cpfCnpj;
+        $this->email = $email;
+        $this->password = $password;
+        $this->type = $type;
+        $this->createdAt = $createdAt ?? new DateTime();
+        $this->updatedAt = $updatedAt ?? new DateTime();
+    }    public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getUsername(): string
+    public function getFullName(): string
     {
-        return $this->username;
+        return $this->fullName;
     }
 
-    public function getFirstName(): string
+    public function getCpfCnpj(): string
     {
-        return $this->firstName;
+        return $this->cpfCnpj;
     }
 
-    public function getLastName(): string
+    public function getEmail(): string
     {
-        return $this->lastName;
+        return $this->email;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getCreatedAt(): DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): DateTime
+    {
+        return $this->updatedAt;
+    }
+
+    public function isCommon(): bool
+    {
+        return $this->type === self::TYPE_COMMON;
+    }
+
+    public function isMerchant(): bool
+    {
+        return $this->type === self::TYPE_MERCHANT;
     }
 
     #[\ReturnTypeWillChange]
@@ -49,9 +94,12 @@ class User implements JsonSerializable
     {
         return [
             'id' => $this->id,
-            'username' => $this->username,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
+            'full_name' => $this->fullName,
+            'cpf_cnpj' => $this->cpfCnpj,
+            'email' => $this->email,
+            'type' => $this->type,
+            'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),
         ];
     }
 }
