@@ -106,18 +106,6 @@ docker-compose up --build
 
 4. **Instale as dependências PHP** (via Docker):
 ```bash
-# Encontre o ID do container PHP
-docker ps
-
-# Execute o bash no container (substitua CONTAINER_ID pelo ID real)
-docker exec -it flux-payments-app bash
-
-# Dentro do container, instale as dependências
-composer install
-```
-
-Ou em uma linha:
-```bash
 docker exec -it flux-payments-app composer install
 ```
 
