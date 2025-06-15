@@ -17,18 +17,15 @@ class ActionTest extends TestCase
     {
         $app = $this->getAppInstance();
         $container = $app->getContainer();
-        $logger = $container->get(LoggerInterface::class);
-
-        $testAction = new class ($logger) extends Action {
+        $logger = $container->get(LoggerInterface::class);        $testAction = new class ($logger) extends Action {
             public function __construct(
                 LoggerInterface $loggerInterface
             ) {
                 parent::__construct($loggerInterface);
-            }
-
-            public function action(): Response
+            }            protected function action($request, $response, $args): Response
             {
                 return $this->respond(
+                    $response,
                     new ActionPayload(
                         202,
                         [
@@ -50,18 +47,17 @@ class ActionTest extends TestCase
     {
         $app = $this->getAppInstance();
         $container = $app->getContainer();
-        $logger = $container->get(LoggerInterface::class);
-
-        $testAction = new class ($logger) extends Action {
+        $logger = $container->get(LoggerInterface::class);        $testAction = new class ($logger) extends Action {
             public function __construct(
                 LoggerInterface $loggerInterface
             ) {
                 parent::__construct($loggerInterface);
             }
 
-            public function action(): Response
+            protected function action($request, $response, $args): Response
             {
                 return $this->respondWithData(
+                    $response,
                     [
                         'willBeDoneAt' => (new DateTimeImmutable())->format(DateTimeImmutable::ATOM)
                     ],
