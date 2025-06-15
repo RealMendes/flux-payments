@@ -121,11 +121,9 @@ Ou em uma linha:
 docker exec -it flux-payments-app composer install
 ```
 
-### Comandos Úteis do Docker
+### Executar testes
 
 ```bash
-# Visualizar l
-# Executar testes
 docker exec -it flux-payments-app composer test
 
 ```
@@ -222,7 +220,6 @@ O sistema implementa tratamento robusto de erros:
 ## 📊 Monitoramento
 
 - Logs estruturados em `logs/app.log`
-- Métricas de performance
 - Rastreamento de transações
 
 ## 🤝 Contribuição
