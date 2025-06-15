@@ -8,6 +8,7 @@ use App\Application\DTO\UserRegisterRequestDTO;
 use App\Domain\Wallet\Wallet;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Exceptions\UserAlreadyExistsException;
+use App\Domain\User\UserNotFoundException;
 
 class UserService
 {
@@ -20,7 +21,9 @@ class UserService
     ) {
         $this->userRepository = $userRepository;
         $this->walletRepository = $walletRepository;
-    }    /**
+    }
+
+    /**
      * Registra um novo usuário no sistema
      *
      * @param UserRegisterRequestDTO $dto
@@ -30,6 +33,8 @@ class UserService
      */
     public function registerUser(UserRegisterRequestDTO $dto): User
     {
+        $this->validateUserUniqueness($dto->getEmail(), $dto->getCpfCnpj());
+        
         $hashedPassword = password_hash($dto->getPassword(), PASSWORD_DEFAULT);
 
         $user = new User(
@@ -51,7 +56,7 @@ class UserService
             $wallet = new Wallet(
                 null,
                 $savedUser->getId(),
-                0.0
+                10.00,
             );
 
             $this->walletRepository->save($wallet);
@@ -61,39 +66,71 @@ class UserService
         } catch (\Exception $e) {
             throw new \Exception('Erro ao registrar usuário: ' . $e->getMessage());
         }
-    }
-
+    }    
+    
     /**
-     * Valida se uma senha corresponde ao hash armazenado
-     *
-     * @param string $password
-     * @param string $hashedPassword
-     * @return bool
-     */
-    public function verifyPassword(string $password, string $hashedPassword): bool
-    {
-        return password_verify($password, $hashedPassword);
-    }
-
-    /**
-     * Busca usuário por e-mail
-     *
      * @param string $email
      * @return User|null
      */
     public function findUserByEmail(string $email): ?User
     {
-        return $this->userRepository->findByEmail($email);
+        try {
+            return $this->userRepository->findByEmail($email);
+        } catch (UserNotFoundException $e) {
+            return null;
+        }
     }
 
     /**
-     * Busca usuário por CPF/CNPJ
-     *
      * @param string $cpfCnpj
      * @return User|null
      */
     public function findUserByCpfCnpj(string $cpfCnpj): ?User
     {
-        return $this->userRepository->findByCpfCnpj($cpfCnpj);
+        try {
+            return $this->userRepository->findByCpfCnpj($cpfCnpj);
+        } catch (UserNotFoundException $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Valida se um usuário já existe no sistema
+     *
+     * @param string $email
+     * @param string $cpfCnpj
+     * @throws UserAlreadyExistsException
+     */
+    private function validateUserUniqueness(string $email, string $cpfCnpj): void
+    {
+        if ($this->userExistsByEmail($email)) {
+            throw UserAlreadyExistsException::byEmail($email);
+        }
+
+        if ($this->userExistsByCpfCnpj($cpfCnpj)) {
+            throw UserAlreadyExistsException::byCpfCnpj($cpfCnpj);
+        }
+    }    
+    
+    /**
+     * Verifica se existe um usuário com o email informado
+     *
+     * @param string $email
+     * @return bool
+     */
+    private function userExistsByEmail(string $email): bool
+    {
+        return $this->findUserByEmail($email) !== null;
+    }
+
+    /**
+     * Verifica se existe um usuário com o CPF/CNPJ informado
+     *
+     * @param string $cpfCnpj
+     * @return bool
+     */
+    private function userExistsByCpfCnpj(string $cpfCnpj): bool
+    {
+        return $this->findUserByCpfCnpj($cpfCnpj) !== null;
     }
 }

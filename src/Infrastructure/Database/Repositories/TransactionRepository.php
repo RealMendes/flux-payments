@@ -94,14 +94,17 @@ class TransactionRepository implements TransactionRepositoryInterface
             'INSERT INTO transactions (value, payer_id, payee_id, status, created_at, updated_at) 
              VALUES (:value, :payer_id, :payee_id, :status, :created_at, :updated_at)'
         );
-        
+        $value = $transaction->getValue();
+        $payerId = $transaction->getPayerId();
+        $payeeId = $transaction->getPayeeId();
+        $status = $transaction->getStatus();
         $createdAt = $transaction->getCreatedAt()->format('Y-m-d H:i:s');
         $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');
         
-        $statement->bindParam(':value', $transaction->getValue(), PDO::PARAM_STR);
-        $statement->bindParam(':payer_id', $transaction->getPayerId(), PDO::PARAM_INT);
-        $statement->bindParam(':payee_id', $transaction->getPayeeId(), PDO::PARAM_INT);
-        $statement->bindParam(':status', $transaction->getStatus(), PDO::PARAM_STR);
+        $statement->bindParam(':value', $value, PDO::PARAM_STR);
+        $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
+        $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
+        $statement->bindParam(':status', $status, PDO::PARAM_STR);
         $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
         
@@ -119,14 +122,18 @@ class TransactionRepository implements TransactionRepositoryInterface
                  status = :status, updated_at = :updated_at 
              WHERE id = :id'
         );
-        
+          $transactionId = $transaction->getId();
+        $value = $transaction->getValue();
+        $payerId = $transaction->getPayerId();
+        $payeeId = $transaction->getPayeeId();
+        $status = $transaction->getStatus();
         $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');
         
-        $statement->bindParam(':id', $transaction->getId(), PDO::PARAM_INT);
-        $statement->bindParam(':value', $transaction->getValue(), PDO::PARAM_STR);
-        $statement->bindParam(':payer_id', $transaction->getPayerId(), PDO::PARAM_INT);
-        $statement->bindParam(':payee_id', $transaction->getPayeeId(), PDO::PARAM_INT);
-        $statement->bindParam(':status', $transaction->getStatus(), PDO::PARAM_STR);
+        $statement->bindParam(':id', $transactionId, PDO::PARAM_INT);
+        $statement->bindParam(':value', $value, PDO::PARAM_STR);
+        $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
+        $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
+        $statement->bindParam(':status', $status, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
         
         $statement->execute();

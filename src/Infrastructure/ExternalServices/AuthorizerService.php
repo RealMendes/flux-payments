@@ -6,6 +6,7 @@ namespace App\Infrastructure\ExternalServices;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 
 class AuthorizerService
@@ -22,54 +23,52 @@ class AuthorizerService
     }
 
     /**
-     * @param array
+     * Autoriza uma transação consultando o serviço externo
+     * 
+     * @param array $transactionData
      * @return bool
      * @throws \Exception
      */
     public function authorize(array $transactionData): bool
     {
         try {
-            $this->logger->info('Iniciando autorização de transação', [
-                'transaction_data' => $transactionData
-            ]);
-
-            $response = $this->httpClient->post($this->authorizerUrl, [
-                'json' => $transactionData,
+            $response = $this->httpClient->get($this->authorizerUrl, [
                 'timeout' => 10,
-                'headers' => [
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json'
-                ]
+                'headers' => ['Accept' => 'application/json']
             ]);
 
-            $statusCode = $response->getStatusCode();
-            $responseBody = json_decode($response->getBody()->getContents(), true);
+            return $this->extractAuthorization($response->getBody()->getContents());
 
-            if ($statusCode === 200) {
-                $authorized = $responseBody['authorized'] ?? false;
-                
-                $this->logger->info('Resposta da autorização recebida', [
-                    'authorized' => $authorized,
-                    'response' => $responseBody
-                ]);
-
-                return (bool) $authorized;
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                return $this->extractAuthorization($e->getResponse()->getBody()->getContents());
             }
-
-            $this->logger->warning('Resposta inesperada do serviço de autorização', [
-                'status_code' => $statusCode,
-                'response' => $responseBody
+            
+            $this->logger->error('Erro na comunicação com serviço de autorização', [
+                'error' => $e->getMessage()
             ]);
-
-            return false;
-
+            
+            throw new \Exception('Falha na comunicação com o serviço de autorização');
+            
         } catch (GuzzleException $e) {
             $this->logger->error('Erro na comunicação com serviço de autorização', [
-                'error' => $e->getMessage(),
-                'transaction_data' => $transactionData
+                'error' => $e->getMessage()
             ]);
-
-            throw new \Exception('Falha na comunicação com o serviço de autorização: ' . $e->getMessage());
+            
+            throw new \Exception('Falha na comunicação com o serviço de autorização');
         }
+    }
+
+    /**
+     * Extrai o valor de autorização da resposta JSON
+     * 
+     * @param string $responseBody
+     * @return bool
+     */
+    private function extractAuthorization(string $responseBody): bool
+    {
+        $data = json_decode($responseBody, true);
+        
+        return $data['data']['authorization'] ?? false;
     }
 }
