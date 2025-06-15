@@ -10,14 +10,15 @@ use App\Domain\User\UserRepository as UserRepositoryInterface;
 use App\Infrastructure\Database\DatabaseConnection;
 use PDO;
 use DateTime;
+use App\Application\Settings\SettingsInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
     private PDO $database;
 
-    public function __construct()
+    public function __construct(SettingsInterface $settings)
     {
-        $this->database = DatabaseConnection::getConnection();
+        $this->database = DatabaseConnection::getConnection($settings);
     }
 
     public function findAll(): array
@@ -99,11 +100,17 @@ class UserRepository implements UserRepositoryInterface
         $createdAt = $user->getCreatedAt()->format('Y-m-d H:i:s');
         $updatedAt = $user->getUpdatedAt()->format('Y-m-d H:i:s');
         
-        $statement->bindParam(':full_name', $user->getFullName(), PDO::PARAM_STR);
-        $statement->bindParam(':cpf_cnpj', $user->getCpfCnpj(), PDO::PARAM_STR);
-        $statement->bindParam(':email', $user->getEmail(), PDO::PARAM_STR);
-        $statement->bindParam(':password', $user->getPassword(), PDO::PARAM_STR);
-        $statement->bindParam(':type', $user->getType(), PDO::PARAM_STR);
+        $fullName = $user->getFullName();
+        $cpfCnpj = $user->getCpfCnpj();
+        $email = $user->getEmail();
+        $password = $user->getPassword();
+        $type = $user->getType();
+
+        $statement->bindParam(':full_name', $fullName, PDO::PARAM_STR);
+        $statement->bindParam(':cpf_cnpj', $cpfCnpj, PDO::PARAM_STR);
+        $statement->bindParam(':email', $email, PDO::PARAM_STR);
+        $statement->bindParam(':password', $password, PDO::PARAM_STR);
+        $statement->bindParam(':type', $type, PDO::PARAM_STR);
         $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
         

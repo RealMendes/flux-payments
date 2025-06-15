@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Database;
 
+use App\Application\Settings\SettingsInterface;
 use PDO;
 use PDOException;
 
@@ -11,14 +12,16 @@ class DatabaseConnection
 {
     private static ?PDO $connection = null;
 
-    public static function getConnection(): PDO
+    public static function getConnection(SettingsInterface $settings): PDO
     {
         if (self::$connection === null) {
-            $host = $_ENV['DB_HOST'] ?? 'localhost';
-            $dbname = $_ENV['DB_DATABASE'] ?? 'flux_payments';
-            $username = $_ENV['DB_USERNAME'] ?? 'flux_user';
-            $password = $_ENV['DB_PASSWORD'] ?? '';
-            $port = $_ENV['DB_PORT'] ?? '3306';
+            $dbSettings = $settings->get('database');
+
+            $host = $dbSettings['host'];
+            $dbname = $dbSettings['name'];
+            $username = $dbSettings['user'];
+            $password = $dbSettings['password'];
+            $port = $dbSettings['port'];
 
             $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 

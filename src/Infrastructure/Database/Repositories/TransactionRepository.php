@@ -10,14 +10,15 @@ use App\Domain\Transaction\TransactionRepository as TransactionRepositoryInterfa
 use App\Infrastructure\Database\DatabaseConnection;
 use PDO;
 use DateTime;
+use App\Application\Settings\SettingsInterface;
 
 class TransactionRepository implements TransactionRepositoryInterface
 {
     private PDO $database;
 
-    public function __construct()
+    public function __construct(SettingsInterface $settings)
     {
-        $this->database = DatabaseConnection::getConnection();
+        $this->database = DatabaseConnection::getConnection($settings);
     }
 
     public function save(Transaction $transaction): Transaction

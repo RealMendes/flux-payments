@@ -6,9 +6,9 @@ use App\Application\Settings\Settings;
 use App\Application\Settings\SettingsInterface;
 use DI\ContainerBuilder;
 use Monolog\Logger;
+use Dotenv\Dotenv;
 
 return function (ContainerBuilder $containerBuilder) {
-
     // Global Settings Object
     $containerBuilder->addDefinitions([
         SettingsInterface::class => function () {
@@ -20,6 +20,13 @@ return function (ContainerBuilder $containerBuilder) {
                     'name' => 'slim-app',
                     'path' => isset($_ENV['docker']) ? 'php://stdout' : __DIR__ . '/../logs/app.log',
                     'level' => Logger::DEBUG,
+                ],
+                'database' => [
+                    'host' => getenv('DB_HOST') ?: 'db',
+                    'port' => getenv('DB_PORT') ?: '3306',
+                    'name' => getenv('DB_DATABASE') ?: 'flux_payments',
+                    'user' => getenv('DB_USERNAME') ?? '',
+                    'password' => getenv('DB_PASSWORD') ?? '',
                 ],
             ]);
         }
