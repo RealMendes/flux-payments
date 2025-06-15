@@ -101,7 +101,7 @@ APP_PORT=8080
 
 3. **Inicie os containers**:
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 
 4. **Instale as dependências PHP** (via Docker):
@@ -124,18 +124,7 @@ docker exec -it flux-payments-app composer install
 ### Comandos Úteis do Docker
 
 ```bash
-# Visualizar logs
-docker-compose logs -f
-
-# Status dos containers
-docker-compose ps
-
-# Parar os containers
-docker-compose down
-
-# Reconstruir as imagens
-docker-compose build --no-cache
-
+# Visualizar l
 # Executar testes
 docker exec -it flux-payments-app composer test
 
@@ -250,4 +239,4 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ---
 
-**Desenvolvido com ❤️ usando PHP, Slim Framework e Docker**
+**Desenvolvido usando PHP, Slim Framework e Docker**
