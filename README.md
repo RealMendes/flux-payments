@@ -121,11 +121,6 @@ Ou em uma linha:
 docker exec -it flux-payments-app composer install
 ```
 
-5. **Execute as migrações do banco** (se houver):
-```bash
-docker exec -it flux-payments-app php bin/setup-database.php
-```
-
 ### Comandos Úteis do Docker
 
 ```bash
@@ -141,20 +136,9 @@ docker-compose down
 # Reconstruir as imagens
 docker-compose build --no-cache
 
-# Acessar o container da aplicação
-docker exec -it flux-payments-app bash
-
-# Acessar o banco de dados
-docker exec -it flux-payments-db mysql -u flux_user -p flux_payments
-
 # Executar testes
 docker exec -it flux-payments-app composer test
 
-# Executar análise estática (PHPStan)
-docker exec -it flux-payments-app composer phpstan
-
-# Executar code sniffer
-docker exec -it flux-payments-app composer phpcs
 ```
 
 ### Acesso à Aplicação
