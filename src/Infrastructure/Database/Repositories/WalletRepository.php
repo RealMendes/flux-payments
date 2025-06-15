@@ -10,14 +10,15 @@ use App\Domain\Wallet\WalletRepository as WalletRepositoryInterface;
 use App\Infrastructure\Database\DatabaseConnection;
 use PDO;
 use DateTime;
+use App\Application\Settings\SettingsInterface;
 
 class WalletRepository implements WalletRepositoryInterface
 {
     private PDO $database;
 
-    public function __construct()
+    public function __construct(SettingsInterface $settings)
     {
-        $this->database = DatabaseConnection::getConnection();
+        $this->database = DatabaseConnection::getConnection($settings);
     }
 
     public function findByUserId(int $userId): Wallet
@@ -78,12 +79,13 @@ class WalletRepository implements WalletRepositoryInterface
             'INSERT INTO wallets (user_id, balance, created_at, updated_at) 
              VALUES (:user_id, :balance, :created_at, :updated_at)'
         );
-        
+          $userId = $wallet->getUserId();
+        $balance = $wallet->getBalance();
         $createdAt = $wallet->getCreatedAt()->format('Y-m-d H:i:s');
         $updatedAt = $wallet->getUpdatedAt()->format('Y-m-d H:i:s');
         
-        $statement->bindParam(':user_id', $wallet->getUserId(), PDO::PARAM_INT);
-        $statement->bindParam(':balance', $wallet->getBalance(), PDO::PARAM_STR);
+        $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $statement->bindParam(':balance', $balance, PDO::PARAM_STR);
         $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
         
@@ -100,12 +102,16 @@ class WalletRepository implements WalletRepositoryInterface
              SET user_id = :user_id, balance = :balance, updated_at = :updated_at 
              WHERE id = :id'
         );
+          $updatedAt = $wallet->getUpdatedAt()->format('Y-m-d H:i:s');
+        $walletId = $wallet->getId();
         
-        $updatedAt = $wallet->getUpdatedAt()->format('Y-m-d H:i:s');
+        $statement->bindParam(':id', $walletId, PDO::PARAM_INT);
         
-        $statement->bindParam(':id', $wallet->getId(), PDO::PARAM_INT);
-        $statement->bindParam(':user_id', $wallet->getUserId(), PDO::PARAM_INT);
-        $statement->bindParam(':balance', $wallet->getBalance(), PDO::PARAM_STR);
+        $userId = $wallet->getUserId();
+        $balance = $wallet->getBalance();
+
+        $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
+        $statement->bindParam(':balance', $balance, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
         
         $statement->execute();
