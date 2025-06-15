@@ -32,7 +32,6 @@ class RegisterUserAction extends Action
                 throw new \InvalidArgumentException('Dados JSON inválidos');
             }
 
-            // Cria DTO com validação
             $dto = new UserRegisterRequestDTO(
                 $data['full_name'] ?? '',
                 $data['cpf_cnpj'] ?? '',
@@ -41,7 +40,6 @@ class RegisterUserAction extends Action
                 $data['type'] ?? 'COMMON'
             );
 
-            // Registra o usuário
             $user = $this->userService->registerUser($dto);
 
             $this->logger->info('Usuário registrado com sucesso', [
