@@ -136,9 +136,9 @@ curl -X GET http://localhost:8080/api/v1/wallets/1/balance
 curl -X POST http://localhost:8080/api/v1/transaction \
   -H "Content-Type: application/json" \
   -d '{
-    "payer_id": 1,
-    "payee_id": 2,
-    "amount": 100.50
+    "payer": 1,
+    "payee": 2,
+    "value": 100.50
   }'
 ```
 

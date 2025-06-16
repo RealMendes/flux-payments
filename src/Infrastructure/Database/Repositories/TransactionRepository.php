@@ -61,7 +61,7 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     public function findByPayerId(int $payerId): array
-    {
+    {        
         $statement = $this->database->prepare('SELECT * FROM transactions WHERE payer_id = :payer_id ORDER BY created_at DESC');
         $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
         $statement->execute();
@@ -75,7 +75,7 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     public function findByPayeeId(int $payeeId): array
-    {
+    {        
         $statement = $this->database->prepare('SELECT * FROM transactions WHERE payee_id = :payee_id ORDER BY created_at DESC');
         $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
         $statement->execute();
@@ -90,8 +90,7 @@ class TransactionRepository implements TransactionRepositoryInterface
 
     private function insert(Transaction $transaction): Transaction
     {
-        $statement = $this->database->prepare(
-            'INSERT INTO transactions (value, payer_id, payee_id, status, created_at, updated_at) 
+        $statement = $this->database->prepare('INSERT INTO transactions (value, payer_id, payee_id, status, created_at, updated_at) 
              VALUES (:value, :payer_id, :payee_id, :status, :created_at, :updated_at)'
         );
         $value = $transaction->getValue();
@@ -99,8 +98,7 @@ class TransactionRepository implements TransactionRepositoryInterface
         $payeeId = $transaction->getPayeeId();
         $status = $transaction->getStatus();
         $createdAt = $transaction->getCreatedAt()->format('Y-m-d H:i:s');
-        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');
-        
+        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');        
         $statement->bindParam(':value', $value, PDO::PARAM_STR);
         $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
         $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
@@ -115,20 +113,19 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     private function update(Transaction $transaction): Transaction
-    {
+    {        
         $statement = $this->database->prepare(
             'UPDATE transactions 
              SET value = :value, payer_id = :payer_id, payee_id = :payee_id, 
                  status = :status, updated_at = :updated_at 
              WHERE id = :id'
         );
-          $transactionId = $transaction->getId();
+        $transactionId = $transaction->getId();
         $value = $transaction->getValue();
         $payerId = $transaction->getPayerId();
         $payeeId = $transaction->getPayeeId();
         $status = $transaction->getStatus();
-        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');
-        
+        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');        
         $statement->bindParam(':id', $transactionId, PDO::PARAM_INT);
         $statement->bindParam(':value', $value, PDO::PARAM_STR);
         $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
@@ -142,7 +139,7 @@ class TransactionRepository implements TransactionRepositoryInterface
     }
 
     private function hydrate(array $row): Transaction
-    {
+    {        
         return new Transaction(
             (int) $row['id'],
             (float) $row['value'],

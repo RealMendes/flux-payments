@@ -73,15 +73,18 @@ class TransactionService
         if ($dto->getValue() <= 0) {
             throw UnauthorizedTransactionException::invalidTransactionAmount();
         }
+        
         if ($payerWallet->getBalance() < $dto->getValue()) {
             throw new InsufficientBalanceException($payerWallet->getBalance(), $dto->getValue());
-        }
+        }   
 
         $authorizationData = [
-            'payer_id' => $dto->getPayerId(),
-            'payee_id' => $dto->getPayeeId(),
+            'payer' => $dto->getPayerId(),
+            'payee' => $dto->getPayeeId(),
             'value' => $dto->getValue()
-        ];        try {
+        ];
+
+        try {
             $authorized = $this->authorizerService->authorize($authorizationData);
             if (!$authorized) {
                 throw UnauthorizedTransactionException::externalServiceDenied();

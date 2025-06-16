@@ -32,28 +32,28 @@ class ExecuteTransactionAction extends Action
             
             if (!is_array($data)) {
                 throw new \InvalidArgumentException('Dados JSON inválidos');
-            }
+            }      
 
-            $dto = new TransactionRequestDTO(
+            $dto = new TransactionRequestDTO
+            (
                 (float) ($data['value'] ?? 0),
-                (int) ($data['payer_id'] ?? 0),
-                (int) ($data['payee_id'] ?? 0)
+                (int) ($data['payer'] ?? 0),
+                (int) ($data['payee'] ?? 0)
             );
 
-            $transaction = $this->transactionService->execute($dto);
-
+            $transaction = $this->transactionService->execute($dto);            
             $this->logger->info('Transação realizada com sucesso', [
                 'transaction_id' => $transaction->getId(),
-                'payer_id' => $transaction->getPayerId(),
-                'payee_id' => $transaction->getPayeeId(),
+                'payer' => $transaction->getPayerId(),
+                'payee' => $transaction->getPayeeId(),
                 'value' => $transaction->getValue()
-            ]);
-
+            ]);            
+            
             $transactionData = [
                 'transaction_id' => $transaction->getId(),
                 'value' => $transaction->getValue(),
-                'payer_id' => $transaction->getPayerId(),
-                'payee_id' => $transaction->getPayeeId(),
+                'payer' => $transaction->getPayerId(),
+                'payee' => $transaction->getPayeeId(),
                 'status' => $transaction->getStatus(),
                 'created_at' => $transaction->getCreatedAt()->format('Y-m-d H:i:s')
             ];

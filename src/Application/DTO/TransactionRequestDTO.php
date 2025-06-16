@@ -8,7 +8,8 @@ class TransactionRequestDTO
 {
     private float $value;
     private int $payerId;
-    private int $payeeId;    public function __construct(
+    private int $payeeId;
+    public function __construct(
         float $value,
         int $payerId,
         int $payeeId

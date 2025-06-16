@@ -95,9 +95,9 @@ class Transaction implements JsonSerializable
     {
         return [
             'id' => $this->id,
-            'value' => $this->value,
-            'payer_id' => $this->payerId,
-            'payee_id' => $this->payeeId,
+            'value' => $this->value,           
+            'payer' => $this->payerId,
+            'payee' => $this->payeeId,
             'status' => $this->status,
             'created_at' => $this->createdAt->format('Y-m-d H:i:s'),
             'updated_at' => $this->updatedAt->format('Y-m-d H:i:s'),

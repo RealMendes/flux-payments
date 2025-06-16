@@ -12,7 +12,8 @@ class UserRegisterRequestDTO
     private string $cpfCnpj;
     private string $email;
     private string $password;
-    private string $type;    public function __construct(
+    private string $type;
+    public function __construct(
         string $fullName,
         string $cpfCnpj,
         string $email,

@@ -17,12 +17,14 @@ class ActionTest extends TestCase
     {
         $app = $this->getAppInstance();
         $container = $app->getContainer();
-        $logger = $container->get(LoggerInterface::class);        $testAction = new class ($logger) extends Action {
+        $logger = $container->get(LoggerInterface::class);
+        $testAction = new class ($logger) extends Action {
             public function __construct(
                 LoggerInterface $loggerInterface
-            ) {
+            ){
                 parent::__construct($loggerInterface);
-            }            protected function action($request, $response, $args): Response
+            }
+            protected function action($request, $response, $args): Response
             {
                 return $this->respond(
                     $response,
@@ -47,7 +49,8 @@ class ActionTest extends TestCase
     {
         $app = $this->getAppInstance();
         $container = $app->getContainer();
-        $logger = $container->get(LoggerInterface::class);        $testAction = new class ($logger) extends Action {
+        $logger = $container->get(LoggerInterface::class);
+        $testAction = new class ($logger) extends Action {
             public function __construct(
                 LoggerInterface $loggerInterface
             ) {
