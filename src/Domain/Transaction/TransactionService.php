@@ -9,44 +9,71 @@ use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Wallet\WalletNotFoundException;
-use App\Infrastructure\ExternalServices\AuthorizerService;
-use App\Infrastructure\ExternalServices\NotificationService;
+use App\Domain\Services\TransactionManagementService;
+use App\Domain\Gateways\PaymentAuthorizationGateway;
+use App\Domain\Services\NotificationService;
+use App\Domain\Repositories\DatabaseTransactionManager;
 use App\Domain\Exceptions\UserNotFoundException;
 use App\Domain\Exceptions\UnauthorizedTransactionException;
 use App\Domain\Exceptions\InsufficientBalanceException;
-use PDO;
 
-class TransactionService
-{
-    private UserRepository $userRepository;
+class TransactionService implements TransactionManagementService
+{    private UserRepository $userRepository;
     private WalletRepository $walletRepository;
     private TransactionRepository $transactionRepository;
-    private AuthorizerService $authorizerService;
+    private PaymentAuthorizationGateway $authorizationGateway;
     private NotificationService $notificationService;
-    private PDO $pdo;
+    private DatabaseTransactionManager $databaseTransactionManager;
 
     public function __construct(
         UserRepository $userRepository,
         WalletRepository $walletRepository,
         TransactionRepository $transactionRepository,
-        AuthorizerService $authorizerService,
+        PaymentAuthorizationGateway $authorizationGateway,
         NotificationService $notificationService,
-        PDO $pdo
+        DatabaseTransactionManager $databaseTransactionManager
     ) {        $this->userRepository = $userRepository;
         $this->walletRepository = $walletRepository;
         $this->transactionRepository = $transactionRepository;
-        $this->authorizerService = $authorizerService;
+        $this->authorizationGateway = $authorizationGateway;
         $this->notificationService = $notificationService;
-        $this->pdo = $pdo;
-    }
-
-    /**
+        $this->databaseTransactionManager = $databaseTransactionManager;
+    }    /**
      * Executa uma transação entre usuários
      *
      * @param TransactionRequestDTO $dto
      * @return Transaction
      * @throws \Exception
-     */    public function execute(TransactionRequestDTO $dto): Transaction
+     */    
+    public function executeTransaction(TransactionRequestDTO $dto): Transaction
+    {
+        return $this->execute($dto);
+    }
+
+    /**
+     * Consulta o histórico de transações de um usuário
+     *
+     * @param int $userId ID do usuário
+     * @return Transaction[] Lista de transações
+     * @throws \Exception Se houver erro na consulta
+     */
+    public function getUserTransactionHistory(int $userId): array
+    {
+        try {
+            return $this->transactionRepository->findByUserId($userId);
+        } catch (\Exception $e) {
+            throw new \Exception('Erro ao consultar histórico de transações: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Executa uma transação entre usuários (método interno)
+     *
+     * @param TransactionRequestDTO $dto
+     * @return Transaction
+     * @throws \Exception
+     */    
+    private function execute(TransactionRequestDTO $dto): Transaction
     {
         try {
             $payer = $this->userRepository->findUserOfId($dto->getPayerId());
@@ -76,16 +103,12 @@ class TransactionService
         
         if ($payerWallet->getBalance() < $dto->getValue()) {
             throw new InsufficientBalanceException($payerWallet->getBalance(), $dto->getValue());
-        }   
-
-        $authorizationData = [
+        }        $authorizationData = [
             'payer' => $dto->getPayerId(),
             'payee' => $dto->getPayeeId(),
             'value' => $dto->getValue()
-        ];
-
-        try {
-            $authorized = $this->authorizerService->authorize($authorizationData);
+        ];        try {
+            $authorized = $this->authorizationGateway->authorizePayment($authorizationData);
             if (!$authorized) {
                 throw UnauthorizedTransactionException::externalServiceDenied();
             }
@@ -93,7 +116,7 @@ class TransactionService
             if ($e instanceof UnauthorizedTransactionException) {
                 throw $e;
             }
-            throw new UnauthorizedTransactionException('Erro na comunicação com serviço de autorização: ' . $e->getMessage());
+            throw new UnauthorizedTransactionException('Erro na comunicação com gateway de autorização: ' . $e->getMessage());
         }
 
         $transaction = new Transaction(
@@ -103,9 +126,8 @@ class TransactionService
             $dto->getPayeeId(),
             Transaction::STATUS_PENDING
         );
-        $this->pdo->beginTransaction();
 
-        try {
+        return $this->databaseTransactionManager->executeInTransaction(function () use ($payerWallet, $payeeWallet, $transaction, $dto, $payer, $payee) {
             $payerWallet->decreaseBalance($dto->getValue());
             $payeeWallet->increaseBalance($dto->getValue());
 
@@ -115,25 +137,11 @@ class TransactionService
             $transaction->markAsCompleted();
             $savedTransaction = $this->transactionRepository->save($transaction);
 
-            $this->pdo->commit();
-
             $this->sendTransactionNotification($payer, $payee, $dto->getValue());
 
             return $savedTransaction;
-
-        } catch (\Exception $e) {
-            $this->pdo->rollBack();
-            
-            if (isset($savedTransaction)) {
-                $transaction->markAsFailed();
-                $this->transactionRepository->save($transaction);
-            }
-
-            throw new \Exception('Erro ao processar transação: ' . $e->getMessage());
-        }
-    }
-
-    /**
+        });
+    }    /**
      * Envia notificação da transação
      *
      * @param User $payer
@@ -142,33 +150,17 @@ class TransactionService
      */
     private function sendTransactionNotification(User $payer, User $payee, float $value): void
     {
-        $notificationData = [
-            'payer' => [
-                'id' => $payer->getId(),
-                'name' => $payer->getFullName(),
-                'email' => $payer->getEmail()
-            ],
-            'payee' => [
-                'id' => $payee->getId(),
-                'name' => $payee->getFullName(),
-                'email' => $payee->getEmail()
-            ],
-            'value' => $value,
-            'timestamp' => date('Y-m-d H:i:s')
-        ];
-
         try {
-            $success = $this->notificationService->sendNotification($notificationData);
+            // Usa o método específico para notificações de transação
+            $this->notificationService->sendTransactionNotification(
+                $payer->getId(),
+                $payee->getId(),
+                $value
+            );
             
-            if (!$success) {
-                $this->notificationService->sendNotificationWithRetry($notificationData);
-            }
         } catch (\Exception $e) {
-            try {
-                $this->notificationService->sendNotificationWithRetry($notificationData);
-            } catch (\Exception $retryException) {
-                error_log('Falha ao enviar notificação após tentativas: ' . $retryException->getMessage());
-            }
+            // Log do erro mas não interrompe o fluxo da transação
+            error_log('Falha ao enviar notificação da transação: ' . $e->getMessage());
         }
     }
 }

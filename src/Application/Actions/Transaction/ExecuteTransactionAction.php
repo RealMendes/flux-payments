@@ -7,7 +7,7 @@ namespace App\Application\Actions\Transaction;
 use App\Application\Actions\Action;
 use App\Application\Actions\ActionPayload;
 use App\Application\DTO\TransactionRequestDTO;
-use App\Domain\Transaction\TransactionService;
+use App\Domain\Services\TransactionManagementService;
 use App\Domain\Exceptions\UserNotFoundException;
 use App\Domain\Exceptions\UnauthorizedTransactionException;
 use App\Domain\Exceptions\InsufficientBalanceException;
@@ -17,12 +17,12 @@ use Psr\Log\LoggerInterface;
 
 class ExecuteTransactionAction extends Action
 {
-    private TransactionService $transactionService;
+    private TransactionManagementService $transactionManagementService;
 
-    public function __construct(LoggerInterface $logger, TransactionService $transactionService)
+    public function __construct(LoggerInterface $logger, TransactionManagementService $transactionManagementService)
     {
         parent::__construct($logger);
-        $this->transactionService = $transactionService;
+        $this->transactionManagementService = $transactionManagementService;
     }
 
     protected function action(Request $request, Response $response, array $args): Response
@@ -41,7 +41,7 @@ class ExecuteTransactionAction extends Action
                 (int) ($data['payee'] ?? 0)
             );
 
-            $transaction = $this->transactionService->execute($dto);            
+            $transaction = $this->transactionManagementService->executeTransaction($dto);            
             $this->logger->info('Transação realizada com sucesso', [
                 'transaction_id' => $transaction->getId(),
                 'payer' => $transaction->getPayerId(),

@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\Domain\User;
 
 use App\Application\DTO\UserRegisterRequestDTO;
+use App\Domain\ValueObjects\Email;
+use App\Domain\ValueObjects\CpfCnpj;
+use App\Domain\ValueObjects\FullName;
+use App\Domain\ValueObjects\Password;
+use App\Domain\ValueObjects\UserType;
 use App\Domain\Wallet\Wallet;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Exceptions\UserAlreadyExistsException;
@@ -30,20 +35,19 @@ class UserService
      * @return User
      * @throws UserAlreadyExistsException
      * @throws \Exception
-     */
-    public function registerUser(UserRegisterRequestDTO $dto): User
+     */    public function registerUser(UserRegisterRequestDTO $dto): User
     {
         $this->validateUserUniqueness($dto->getEmail(), $dto->getCpfCnpj());
         
-        $hashedPassword = password_hash($dto->getPassword(), PASSWORD_DEFAULT);
+        $hashedPassword = $dto->getPassword()->getHashed();
 
         $user = new User(
             null,
-            $dto->getFullName(),
-            $dto->getCpfCnpj(),
-            $dto->getEmail(),
+            $dto->getFullName()->getValue(),
+            $dto->getCpfCnpj()->getValue(),
+            $dto->getEmail()->getValue(),
             $hashedPassword,
-            $dto->getType()
+            $dto->getType()->getValue()
         );
 
         try {
@@ -92,25 +96,23 @@ class UserService
         } catch (UserNotFoundException $e) {
             return null;
         }
-    }
-
-    /**
+    }    /**
      * Valida se um usuário já existe no sistema
      *
-     * @param string $email
-     * @param string $cpfCnpj
+     * @param Email $email
+     * @param CpfCnpj $cpfCnpj
      * @throws UserAlreadyExistsException
      */
-    private function validateUserUniqueness(string $email, string $cpfCnpj): void
+    private function validateUserUniqueness(Email $email, CpfCnpj $cpfCnpj): void
     {
-        if ($this->userExistsByEmail($email)) {
-            throw UserAlreadyExistsException::byEmail($email);
+        if ($this->userExistsByEmail($email->getValue())) {
+            throw UserAlreadyExistsException::byEmail($email->getValue());
         }
 
-        if ($this->userExistsByCpfCnpj($cpfCnpj)) {
-            throw UserAlreadyExistsException::byCpfCnpj($cpfCnpj);
+        if ($this->userExistsByCpfCnpj($cpfCnpj->getValue())) {
+            throw UserAlreadyExistsException::byCpfCnpj($cpfCnpj->getValue());
         }
-    }    
+    }
     
     /**
      * Verifica se existe um usuário com o email informado

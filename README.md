@@ -40,10 +40,12 @@ src/
 │   ├── User/             # Agregado de Usuário
 │   ├── Wallet/           # Agregado de Carteira
 │   ├── Transaction/      # Agregado de Transação
+│   ├── ValueObjects/     # Value Objects do domínio
+│   ├── Services/         # Interfaces de serviços de domínio
 │   └── Exceptions/       # Exceções de domínio
 └── Infrastructure/       # Camada de Infraestrutura
     ├── Database/         # Repositórios e conexão
-    └── ExternalServices/ # Serviços externos
+    └── Adapters/         # Adaptadores para serviços externos
 ```
 
 ## 🚀 Rotas da API

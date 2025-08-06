@@ -12,8 +12,13 @@ use App\Domain\Wallet\WalletService;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Transaction\TransactionService;
 use App\Domain\Transaction\TransactionRepository;
-use App\Infrastructure\ExternalServices\AuthorizerService;
-use App\Infrastructure\ExternalServices\NotificationService;
+use App\Domain\Services\TransactionManagementService;
+use App\Domain\Gateways\PaymentAuthorizationGateway;
+use App\Domain\Services\NotificationService;
+use App\Domain\Repositories\DatabaseTransactionManager;
+use App\Infrastructure\Adapters\ExternalPaymentAuthorizationAdapter;
+use App\Infrastructure\Adapters\HttpNotificationServiceAdapter;
+use App\Infrastructure\Adapters\DatabaseTransactionManagerAdapter;
 use App\Infrastructure\Database\DatabaseConnection;
 use GuzzleHttp\Client;
 use DI\ContainerBuilder;
@@ -51,24 +56,32 @@ return function (ContainerBuilder $containerBuilder) {
             return new Client([
                 'timeout' => 10,
                 'connect_timeout' => 5,
-            ]);
-        },
+            ]);        },
 
-        // External Services
-        AuthorizerService::class => function (ContainerInterface $c) {
-            return new AuthorizerService(
+        // Gateways e Serviços Externos (Driven Adapters)
+        PaymentAuthorizationGateway::class => function (ContainerInterface $c) {
+            return new ExternalPaymentAuthorizationAdapter(
                 $c->get(Client::class),
                 $_ENV['AUTHORIZER_API_URL'] ?? '',
                 $c->get(LoggerInterface::class)
             );
         },        
         NotificationService::class => function (ContainerInterface $c) {
-            return new NotificationService(
+            return new HttpNotificationServiceAdapter(
                 $c->get(Client::class),
                 $_ENV['NOTIFICATION_API_URL'] ?? '',
                 $c->get(LoggerInterface::class)
             );
-        },        
+        },
+        DatabaseTransactionManager::class => function (ContainerInterface $c) {
+            return new DatabaseTransactionManagerAdapter(
+                $c->get(\PDO::class),
+                $c->get(LoggerInterface::class)
+            );
+        },
+        
+        // Serviços de Domínio (Domain Services)
+        TransactionManagementService::class => \DI\autowire(TransactionService::class),
         // Domain Services
         UserService::class => function (ContainerInterface $c) {
             return new UserService(
@@ -81,15 +94,14 @@ return function (ContainerBuilder $containerBuilder) {
             return new WalletService(
                 $c->get(WalletRepository::class)
             );
-        },        
-        TransactionService::class => function (ContainerInterface $c) {
+        },        TransactionService::class => function (ContainerInterface $c) {
             return new TransactionService(
                 $c->get(UserRepository::class),
                 $c->get(WalletRepository::class),
                 $c->get(TransactionRepository::class),
-                $c->get(AuthorizerService::class),
+                $c->get(PaymentAuthorizationGateway::class),
                 $c->get(NotificationService::class),
-                $c->get(\PDO::class)
+                $c->get(DatabaseTransactionManager::class)
             );
         },
         // Actions
@@ -104,11 +116,10 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(LoggerInterface::class),
                 $c->get(WalletService::class)
             );
-        },       
-        ExecuteTransactionAction::class => function (ContainerInterface $c) {
+        },        ExecuteTransactionAction::class => function (ContainerInterface $c) {
             return new ExecuteTransactionAction(
                 $c->get(LoggerInterface::class),
-                $c->get(TransactionService::class)
+                $c->get(TransactionManagementService::class)
             );
         },
     ]);
