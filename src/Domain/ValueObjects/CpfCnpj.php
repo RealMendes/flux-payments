@@ -52,6 +52,11 @@ final class CpfCnpj
         return $this->value;
     }
 
+    public function __toString(): string
+    {
+        return $this->value;
+    }
+
     public function getType(): string
     {
         return $this->type;

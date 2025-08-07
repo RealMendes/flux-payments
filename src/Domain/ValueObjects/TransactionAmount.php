@@ -36,6 +36,11 @@ final class TransactionAmount
         return $this->value;
     }
 
+    public function __toString(): string
+    {
+        return (string) $this->value;
+    }
+
     public function getFormattedValue(): string
     {
         return number_format($this->value, 2, ',', '.');

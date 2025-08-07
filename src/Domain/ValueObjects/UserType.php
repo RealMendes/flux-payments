@@ -40,6 +40,11 @@ final class UserType
         return $this->value;
     }
 
+    public function __toString(): string
+    {
+        return $this->value;
+    }
+
     public function isCommon(): bool
     {
         return $this->value === self::COMMON;

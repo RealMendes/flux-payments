@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Transaction;
 
 use App\Application\Actions\Transaction\ExecuteTransactionAction;
-use App\Domain\Transaction\TransactionService;
+use App\Domain\Services\TransactionManagementService;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -18,14 +18,12 @@ use Slim\Psr7\Uri;
 
 class ExecuteTransactionActionTest extends TestCase
 {
-    use ProphecyTrait;
-
-    private ObjectProphecy $transactionServiceProphecy;
+    use ProphecyTrait;    private ObjectProphecy $transactionManagementServiceProphecy;
     private ObjectProphecy $loggerProphecy;
 
     protected function setUp(): void
     {
-        $this->transactionServiceProphecy = $this->prophesize(TransactionService::class);
+        $this->transactionManagementServiceProphecy = $this->prophesize(TransactionManagementService::class);
         $this->loggerProphecy = $this->prophesize(LoggerInterface::class);
     }
 
@@ -33,7 +31,7 @@ class ExecuteTransactionActionTest extends TestCase
     {
         $action = new ExecuteTransactionAction(
             $this->loggerProphecy->reveal(),
-            $this->transactionServiceProphecy->reveal()
+            $this->transactionManagementServiceProphecy->reveal()
         );
 
         $this->assertInstanceOf(ExecuteTransactionAction::class, $action);
@@ -43,7 +41,7 @@ class ExecuteTransactionActionTest extends TestCase
     {
         $action = new ExecuteTransactionAction(
             $this->loggerProphecy->reveal(),
-            $this->transactionServiceProphecy->reveal()
+            $this->transactionManagementServiceProphecy->reveal()
         );
 
         $request = $this->createJsonRequest('POST', '/api/v1/transaction', [
