@@ -19,11 +19,11 @@ final class Email
     public function __construct(string $email)
     {
         $normalizedEmail = $this->normalize($email);
-        
+
         if (!v::email()->validate($normalizedEmail)) {
             throw new InvalidArgumentException('E-mail inválido');
         }
-        
+
         $this->value = $normalizedEmail;
     }
 

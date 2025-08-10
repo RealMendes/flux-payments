@@ -28,7 +28,7 @@ class HttpNotificationServiceAdapter implements NotificationService
         $this->logger = $logger;
     }
 
-    public function sendNotification(int $userId, string $message, array $metadata = []): bool
+    private function sendNotification(int $userId, string $message, array $metadata = []): bool
     {
         try {
             $notificationData = array_merge([
@@ -41,11 +41,6 @@ class HttpNotificationServiceAdapter implements NotificationService
                 'url' => $this->notificationUrl,
                 'notification_data' => $notificationData
             ]);
-
-            if (empty($this->notificationUrl)) {
-                $this->logger->warning('URL do serviço de notificação não configurada, simulando envio');
-                return true;
-            }
 
             $response = $this->httpClient->post($this->notificationUrl, [
                 'json' => $notificationData,
@@ -64,33 +59,30 @@ class HttpNotificationServiceAdapter implements NotificationService
             ]);
 
             return $sent;
-
         } catch (RequestException $e) {
             $this->logger->error('Erro na comunicação com serviço de notificação', [
                 'error' => $e->getMessage(),
                 'url' => $this->notificationUrl,
                 'user_id' => $userId
             ]);
-            
+
             // Para notificações, não queremos falhar a transação se a notificação falhar
             return false;
-
         } catch (GuzzleException $e) {
             $this->logger->error('Erro HTTP no serviço de notificação', [
                 'error' => $e->getMessage(),
                 'url' => $this->notificationUrl,
                 'user_id' => $userId
             ]);
-            
-            return false;
 
+            return false;
         } catch (\Exception $e) {
             $this->logger->error('Erro inesperado no serviço de notificação', [
                 'error' => $e->getMessage(),
                 'url' => $this->notificationUrl,
                 'user_id' => $userId
             ]);
-            
+
             return false;
         }
     }
@@ -110,12 +102,11 @@ class HttpNotificationServiceAdapter implements NotificationService
         try {
             // Notifica o pagador
             $payerNotified = $this->sendNotification($payerId, $payerMessage, $transactionMetadata);
-            
+
             // Notifica o recebedor
             $payeeNotified = $this->sendNotification($payeeId, $payeeMessage, $transactionMetadata);
-            
+
             return $payerNotified && $payeeNotified;
-            
         } catch (\Exception $e) {
             $this->logger->error('Falha ao enviar notificações de transação', [
                 'error' => $e->getMessage(),
@@ -123,7 +114,7 @@ class HttpNotificationServiceAdapter implements NotificationService
                 'payee_id' => $payeeId,
                 'amount' => $amount
             ]);
-            
+
             return false;
         }
     }

@@ -21,7 +21,7 @@ final class Password
         if (!v::stringType()->length(6, null)->validate($password)) {
             throw new InvalidArgumentException('Senha deve ter pelo menos 6 caracteres');
         }
-        
+
         $this->value = $password;
     }
 

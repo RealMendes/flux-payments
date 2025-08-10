@@ -35,12 +35,12 @@ class TransactionRepository implements TransactionRepositoryInterface
         $statement = $this->database->prepare('SELECT * FROM transactions WHERE id = :id');
         $statement->bindParam(':id', $id, PDO::PARAM_INT);
         $statement->execute();
-        
+
         $row = $statement->fetch();
         if (!$row) {
             throw new TransactionNotFoundException();
         }
-        
+
         return $this->hydrate($row);
     }
 
@@ -51,46 +51,19 @@ class TransactionRepository implements TransactionRepositoryInterface
         );
         $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $statement->execute();
-        
-        $transactions = [];
-        while ($row = $statement->fetch()) {
-            $transactions[] = $this->hydrate($row);
-        }
-        
-        return $transactions;
-    }
 
-    public function findByPayerId(int $payerId): array
-    {        
-        $statement = $this->database->prepare('SELECT * FROM transactions WHERE payer_id = :payer_id ORDER BY created_at DESC');
-        $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
-        $statement->execute();
-        
         $transactions = [];
         while ($row = $statement->fetch()) {
             $transactions[] = $this->hydrate($row);
         }
-        
-        return $transactions;
-    }
 
-    public function findByPayeeId(int $payeeId): array
-    {        
-        $statement = $this->database->prepare('SELECT * FROM transactions WHERE payee_id = :payee_id ORDER BY created_at DESC');
-        $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
-        $statement->execute();
-        
-        $transactions = [];
-        while ($row = $statement->fetch()) {
-            $transactions[] = $this->hydrate($row);
-        }
-        
         return $transactions;
     }
 
     private function insert(Transaction $transaction): Transaction
     {
-        $statement = $this->database->prepare('INSERT INTO transactions (value, payer_id, payee_id, status, created_at, updated_at) 
+        $statement = $this->database->prepare(
+            'INSERT INTO transactions (value, payer_id, payee_id, status, created_at, updated_at) 
              VALUES (:value, :payer_id, :payee_id, :status, :created_at, :updated_at)'
         );
         $value = $transaction->getValue();
@@ -98,22 +71,22 @@ class TransactionRepository implements TransactionRepositoryInterface
         $payeeId = $transaction->getPayeeId();
         $status = $transaction->getStatus();
         $createdAt = $transaction->getCreatedAt()->format('Y-m-d H:i:s');
-        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');        
+        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');
         $statement->bindParam(':value', $value, PDO::PARAM_STR);
         $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
         $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
         $statement->bindParam(':status', $status, PDO::PARAM_STR);
         $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
-        
+
         $statement->execute();
-        
+
         $id = (int) $this->database->lastInsertId();
         return $this->findById($id);
     }
 
     private function update(Transaction $transaction): Transaction
-    {        
+    {
         $statement = $this->database->prepare(
             'UPDATE transactions 
              SET value = :value, payer_id = :payer_id, payee_id = :payee_id, 
@@ -125,21 +98,21 @@ class TransactionRepository implements TransactionRepositoryInterface
         $payerId = $transaction->getPayerId();
         $payeeId = $transaction->getPayeeId();
         $status = $transaction->getStatus();
-        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');        
+        $updatedAt = $transaction->getUpdatedAt()->format('Y-m-d H:i:s');
         $statement->bindParam(':id', $transactionId, PDO::PARAM_INT);
         $statement->bindParam(':value', $value, PDO::PARAM_STR);
         $statement->bindParam(':payer_id', $payerId, PDO::PARAM_INT);
         $statement->bindParam(':payee_id', $payeeId, PDO::PARAM_INT);
         $statement->bindParam(':status', $status, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
-        
+
         $statement->execute();
-        
+
         return $this->findById($transaction->getId());
     }
 
     private function hydrate(array $row): Transaction
-    {        
+    {
         return new Transaction(
             (int) $row['id'],
             (float) $row['value'],

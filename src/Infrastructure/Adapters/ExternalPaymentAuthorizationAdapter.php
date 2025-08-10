@@ -37,11 +37,6 @@ class ExternalPaymentAuthorizationAdapter implements PaymentAuthorizationGateway
                 'transaction_data' => $transactionData
             ]);
 
-            if ($this->isUrlNotConfigured()) {
-                $this->logger->warning('URL do gateway de autorização não configurada, aprovando automaticamente');
-                return true;
-            }
-
             $response = $this->makeAuthorizationRequest($transactionData);
             $responseData = $this->parseResponseBody($response);
             $authorized = $this->extractAuthorizationStatus($responseData);
@@ -56,7 +51,6 @@ class ExternalPaymentAuthorizationAdapter implements PaymentAuthorizationGateway
             }
 
             return $authorized;
-
         } catch (RequestException $e) {
             return $this->handleRequestException($e);
         } catch (GuzzleException $e) {
@@ -99,11 +93,11 @@ class ExternalPaymentAuthorizationAdapter implements PaymentAuthorizationGateway
         if (isset($data['data']['authorization'])) {
             return (bool) $data['data']['authorization'];
         }
-        
+
         if (isset($data['message']) && $data['message'] === 'Autorizado') {
             return true;
         }
-        
+
         if (isset($data['authorized'])) {
             return (bool) $data['authorized'];
         }
@@ -114,7 +108,7 @@ class ExternalPaymentAuthorizationAdapter implements PaymentAuthorizationGateway
     private function handleRequestException(RequestException $e): bool
     {
         $response = $e->getResponse();
-        
+
         if (!$response) {
             $this->logger->error('Erro na comunicação com gateway de autorização', [
                 'error' => $e->getMessage(),
@@ -129,13 +123,13 @@ class ExternalPaymentAuthorizationAdapter implements PaymentAuthorizationGateway
 
         if ($this->hasValidAuthorizationResponse($data)) {
             $authorized = (bool) $data['data']['authorization'];
-            
+
             $this->logger->warning('Gateway de autorização retornou erro HTTP, mas com resposta válida', [
                 'status_code' => $statusCode,
                 'authorized' => $authorized,
                 'response_body' => $body
             ]);
-            
+
             return $authorized;
         }
 
@@ -166,7 +160,6 @@ class ExternalPaymentAuthorizationAdapter implements PaymentAuthorizationGateway
 
             $response = $this->makeHealthCheckRequest();
             return $this->isHealthCheckSuccessful($response);
-
         } catch (\Exception $e) {
             $this->logger->warning('Gateway de autorização indisponível', [
                 'error' => $e->getMessage(),

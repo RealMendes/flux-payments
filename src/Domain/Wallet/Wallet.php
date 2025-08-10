@@ -68,19 +68,20 @@ class Wallet implements JsonSerializable
         if ($amount <= 0) {
             throw new \InvalidArgumentException('O valor deve ser positivo');
         }
-        
+
         $this->balance += $amount;
         $this->updatedAt = new DateTime();
-    }    public function decreaseBalance(float $amount): void
+    }
+    public function decreaseBalance(float $amount): void
     {
         if ($amount <= 0) {
             throw new \InvalidArgumentException('O valor deve ser positivo');
         }
-        
+
         if ($this->balance < $amount) {
             throw new InsufficientBalanceException($this->balance, $amount);
         }
-        
+
         $this->balance -= $amount;
         $this->updatedAt = new DateTime();
     }

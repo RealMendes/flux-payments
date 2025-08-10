@@ -27,23 +27,22 @@ class DatabaseTransactionManagerAdapter implements DatabaseTransactionManager
     public function executeInTransaction(callable $operations)
     {
         $this->beginTransaction();
-        
+
         try {
             $result = $operations();
             $this->commit();
-            
+
             $this->logger->info('Transação de banco de dados executada com sucesso');
-            
+
             return $result;
-            
         } catch (\Exception $e) {
             $this->rollback();
-            
+
             $this->logger->error('Erro na transação de banco de dados, executando rollback', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            
+
             throw $e;
         }
     }
@@ -53,7 +52,7 @@ class DatabaseTransactionManagerAdapter implements DatabaseTransactionManager
         if (!$this->pdo->beginTransaction()) {
             throw new \Exception('Não foi possível iniciar a transação de banco de dados');
         }
-        
+
         $this->logger->debug('Transação de banco de dados iniciada');
     }
 
@@ -62,7 +61,7 @@ class DatabaseTransactionManagerAdapter implements DatabaseTransactionManager
         if (!$this->pdo->commit()) {
             throw new \Exception('Não foi possível confirmar a transação de banco de dados');
         }
-        
+
         $this->logger->debug('Transação de banco de dados confirmada');
     }
 
@@ -71,7 +70,7 @@ class DatabaseTransactionManagerAdapter implements DatabaseTransactionManager
         if (!$this->pdo->rollback()) {
             throw new \Exception('Não foi possível desfazer a transação de banco de dados');
         }
-        
+
         $this->logger->debug('Transação de banco de dados desfeita (rollback)');
     }
 }

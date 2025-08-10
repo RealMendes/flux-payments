@@ -25,12 +25,12 @@ class UserRepository implements UserRepositoryInterface
     {
         $statement = $this->database->prepare('SELECT * FROM users ORDER BY id');
         $statement->execute();
-        
+
         $users = [];
         while ($row = $statement->fetch()) {
             $users[] = $this->hydrate($row);
         }
-        
+
         return $users;
     }
 
@@ -44,12 +44,12 @@ class UserRepository implements UserRepositoryInterface
         $statement = $this->database->prepare('SELECT * FROM users WHERE id = :id');
         $statement->bindParam(':id', $id, PDO::PARAM_INT);
         $statement->execute();
-        
+
         $row = $statement->fetch();
         if (!$row) {
             throw new UserNotFoundException();
         }
-        
+
         return $this->hydrate($row);
     }
 
@@ -58,12 +58,12 @@ class UserRepository implements UserRepositoryInterface
         $statement = $this->database->prepare('SELECT * FROM users WHERE cpf_cnpj = :cpf_cnpj');
         $statement->bindParam(':cpf_cnpj', $cpfCnpj, PDO::PARAM_STR);
         $statement->execute();
-        
+
         $row = $statement->fetch();
         if (!$row) {
             throw new UserNotFoundException();
         }
-        
+
         return $this->hydrate($row);
     }
 
@@ -72,12 +72,12 @@ class UserRepository implements UserRepositoryInterface
         $statement = $this->database->prepare('SELECT * FROM users WHERE email = :email');
         $statement->bindParam(':email', $email, PDO::PARAM_STR);
         $statement->execute();
-        
+
         $row = $statement->fetch();
         if (!$row) {
             throw new UserNotFoundException();
         }
-        
+
         return $this->hydrate($row);
     }
 
@@ -96,10 +96,10 @@ class UserRepository implements UserRepositoryInterface
             'INSERT INTO users (full_name, cpf_cnpj, email, password, type, created_at, updated_at) 
              VALUES (:full_name, :cpf_cnpj, :email, :password, :type, :created_at, :updated_at)'
         );
-        
+
         $createdAt = $user->getCreatedAt()->format('Y-m-d H:i:s');
         $updatedAt = $user->getUpdatedAt()->format('Y-m-d H:i:s');
-        
+
         $fullName = $user->getFullName();
         $cpfCnpj = $user->getCpfCnpj();
         $email = $user->getEmail();
@@ -113,9 +113,9 @@ class UserRepository implements UserRepositoryInterface
         $statement->bindParam(':type', $type, PDO::PARAM_STR);
         $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
-        
+
         $statement->execute();
-        
+
         $id = (int) $this->database->lastInsertId();
         return $this->findById($id);
     }
@@ -128,9 +128,9 @@ class UserRepository implements UserRepositoryInterface
                  password = :password, type = :type, updated_at = :updated_at 
              WHERE id = :id'
         );
-        
+
         $updatedAt = $user->getUpdatedAt()->format('Y-m-d H:i:s');
-        
+
         $statement->bindParam(':id', $user->getId(), PDO::PARAM_INT);
         $statement->bindParam(':full_name', $user->getFullName(), PDO::PARAM_STR);
         $statement->bindParam(':cpf_cnpj', $user->getCpfCnpj(), PDO::PARAM_STR);
@@ -138,9 +138,9 @@ class UserRepository implements UserRepositoryInterface
         $statement->bindParam(':password', $user->getPassword(), PDO::PARAM_STR);
         $statement->bindParam(':type', $user->getType(), PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
-        
+
         $statement->execute();
-        
+
         return $this->findById($user->getId());
     }
 

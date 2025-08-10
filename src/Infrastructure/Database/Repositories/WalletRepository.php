@@ -26,12 +26,12 @@ class WalletRepository implements WalletRepositoryInterface
         $statement = $this->database->prepare('SELECT * FROM wallets WHERE user_id = :user_id');
         $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $statement->execute();
-        
+
         $row = $statement->fetch();
         if (!$row) {
             throw new WalletNotFoundException();
         }
-        
+
         return $this->hydrate($row);
     }
 
@@ -40,13 +40,13 @@ class WalletRepository implements WalletRepositoryInterface
         $statement = $this->database->prepare(
             'UPDATE wallets SET balance = :balance, updated_at = :updated_at WHERE user_id = :user_id'
         );
-        
+
         $updatedAt = (new DateTime())->format('Y-m-d H:i:s');
-        
+
         $statement->bindParam(':balance', $amount, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
         $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
-        
+
         return $statement->execute();
     }
 
@@ -64,12 +64,12 @@ class WalletRepository implements WalletRepositoryInterface
         $statement = $this->database->prepare('SELECT * FROM wallets WHERE id = :id');
         $statement->bindParam(':id', $id, PDO::PARAM_INT);
         $statement->execute();
-        
+
         $row = $statement->fetch();
         if (!$row) {
             throw new WalletNotFoundException();
         }
-        
+
         return $this->hydrate($row);
     }
 
@@ -79,18 +79,18 @@ class WalletRepository implements WalletRepositoryInterface
             'INSERT INTO wallets (user_id, balance, created_at, updated_at) 
              VALUES (:user_id, :balance, :created_at, :updated_at)'
         );
-          $userId = $wallet->getUserId();
+        $userId = $wallet->getUserId();
         $balance = $wallet->getBalance();
         $createdAt = $wallet->getCreatedAt()->format('Y-m-d H:i:s');
         $updatedAt = $wallet->getUpdatedAt()->format('Y-m-d H:i:s');
-        
+
         $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $statement->bindParam(':balance', $balance, PDO::PARAM_STR);
         $statement->bindParam(':created_at', $createdAt, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
-        
+
         $statement->execute();
-        
+
         $id = (int) $this->database->lastInsertId();
         return $this->findById($id);
     }
@@ -102,20 +102,20 @@ class WalletRepository implements WalletRepositoryInterface
              SET user_id = :user_id, balance = :balance, updated_at = :updated_at 
              WHERE id = :id'
         );
-          $updatedAt = $wallet->getUpdatedAt()->format('Y-m-d H:i:s');
+        $updatedAt = $wallet->getUpdatedAt()->format('Y-m-d H:i:s');
         $walletId = $wallet->getId();
-        
+
         $statement->bindParam(':id', $walletId, PDO::PARAM_INT);
-        
+
         $userId = $wallet->getUserId();
         $balance = $wallet->getBalance();
 
         $statement->bindParam(':user_id', $userId, PDO::PARAM_INT);
         $statement->bindParam(':balance', $balance, PDO::PARAM_STR);
         $statement->bindParam(':updated_at', $updatedAt, PDO::PARAM_STR);
-        
+
         $statement->execute();
-        
+
         return $this->findById($wallet->getId());
     }
 

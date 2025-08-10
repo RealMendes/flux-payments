@@ -22,7 +22,8 @@ class TransactionRequestDTO
         $payerIdVO = new UserId($payerId);
         $payeeIdVO = new UserId($payeeId);
         $this->participants = new TransactionParticipants($payerIdVO, $payeeIdVO);
-    }    public function getAmount(): TransactionAmount
+    }
+    public function getAmount(): TransactionAmount
     {
         return $this->amount;
     }

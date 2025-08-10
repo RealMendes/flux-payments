@@ -29,26 +29,25 @@ class ExecuteTransactionAction extends Action
     {
         try {
             $data = $this->getFormData($request);
-            
+
             if (!is_array($data)) {
                 throw new \InvalidArgumentException('Dados JSON inválidos');
-            }      
+            }
 
-            $dto = new TransactionRequestDTO
-            (
-                (float) ($data['value'] ?? 0),
-                (int) ($data['payer'] ?? 0),
-                (int) ($data['payee'] ?? 0)
-            );
+            $dto = new TransactionRequestDTO(
+                    (float) ($data['value'] ?? 0),
+                    (int) ($data['payer'] ?? 0),
+                    (int) ($data['payee'] ?? 0)
+                );
 
-            $transaction = $this->transactionManagementService->executeTransaction($dto);            
+            $transaction = $this->transactionManagementService->executeTransaction($dto);
             $this->logger->info('Transação realizada com sucesso', [
                 'transaction_id' => $transaction->getId(),
                 'payer' => $transaction->getPayerId(),
                 'payee' => $transaction->getPayeeId(),
                 'value' => $transaction->getValue()
-            ]);            
-            
+            ]);
+
             $transactionData = [
                 'transaction_id' => $transaction->getId(),
                 'value' => $transaction->getValue(),
@@ -62,7 +61,6 @@ class ExecuteTransactionAction extends Action
                 'message' => 'Transação realizada com sucesso',
                 'data' => $transactionData
             ], 201);
-
         } catch (\InvalidArgumentException $e) {
             $this->logger->warning('Erro de validação na transação', [
                 'error' => $e->getMessage(),
@@ -75,7 +73,6 @@ class ExecuteTransactionAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (UserNotFoundException $e) {
             $this->logger->warning('Tentativa de transação com usuário inexistente', [
                 'error' => $e->getMessage(),
@@ -88,7 +85,6 @@ class ExecuteTransactionAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (UnauthorizedTransactionException $e) {
             $this->logger->warning('Transação não autorizada', [
                 'error' => $e->getMessage(),
@@ -101,7 +97,6 @@ class ExecuteTransactionAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (InsufficientBalanceException $e) {
             $this->logger->warning('Tentativa de transação com saldo insuficiente', [
                 'error' => $e->getMessage(),
@@ -114,7 +109,6 @@ class ExecuteTransactionAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (\Exception $e) {
             $this->logger->error('Erro interno na transação', [
                 'error' => $e->getMessage(),

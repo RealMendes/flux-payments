@@ -114,7 +114,8 @@ class TransactionRequestDTOTest extends TestCase
             1,
             2
         );
-    }    public function testParticipantsValidation(): void
+    }
+    public function testParticipantsValidation(): void
     {
         $dto = new TransactionRequestDTO(
             100.50,
@@ -123,10 +124,10 @@ class TransactionRequestDTOTest extends TestCase
         );
 
         $participants = $dto->getParticipants();
-        
+
         $this->assertEquals(5, $participants->getPayerId()->getValue());
         $this->assertEquals(10, $participants->getPayeeId()->getValue());
-        
+
         // Teste se tem um participante específico
         $payerId = new \App\Domain\ValueObjects\UserId(5);
         $this->assertTrue($participants->hasParticipant($payerId));

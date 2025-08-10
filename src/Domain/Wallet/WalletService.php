@@ -23,7 +23,8 @@ class WalletService
      * @throws UserNotFoundException
      */
     public function getBalanceByUserId(int $userId): float
-    {        try {
+    {
+        try {
             $wallet = $this->walletRepository->findByUserId($userId);
             return $wallet->getBalance();
         } catch (WalletNotFoundException $e) {
@@ -39,7 +40,8 @@ class WalletService
      * @throws UserNotFoundException
      */
     public function getWalletByUserId(int $userId): Wallet
-    {        try {
+    {
+        try {
             return $this->walletRepository->findByUserId($userId);
         } catch (WalletNotFoundException $e) {
             throw UserNotFoundException::withoutWallet($userId);

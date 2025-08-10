@@ -27,7 +27,7 @@ class RegisterUserAction extends Action
     {
         try {
             $data = $this->getFormData($request);
-            
+
             if (!is_array($data)) {
                 throw new \InvalidArgumentException('Dados JSON inválidos');
             }
@@ -60,7 +60,6 @@ class RegisterUserAction extends Action
                 'message' => 'Usuário registrado com sucesso',
                 'data' => $userData
             ], 201);
-
         } catch (\InvalidArgumentException $e) {
             $this->logger->warning('Erro de validação no registro de usuário', [
                 'error' => $e->getMessage(),
@@ -73,7 +72,6 @@ class RegisterUserAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (UserAlreadyExistsException $e) {
             $this->logger->warning('Tentativa de registro de usuário duplicado', [
                 'error' => $e->getMessage(),
@@ -86,7 +84,6 @@ class RegisterUserAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (\Exception $e) {
             $this->logger->error('Erro interno no registro de usuário', [
                 'error' => $e->getMessage(),

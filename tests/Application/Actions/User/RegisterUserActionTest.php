@@ -60,7 +60,7 @@ class RegisterUserActionTest extends TestCase
     {
         $json = json_encode($data);
         $stream = (new StreamFactory())->createStream($json);
-        
+
         return new SlimRequest(
             $method,
             new Uri('', '', 80, $path),

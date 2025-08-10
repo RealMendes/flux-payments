@@ -56,7 +56,8 @@ return function (ContainerBuilder $containerBuilder) {
             return new Client([
                 'timeout' => 10,
                 'connect_timeout' => 5,
-            ]);        },
+            ]);
+        },
 
         // Gateways e Serviços Externos (Driven Adapters)
         PaymentAuthorizationGateway::class => function (ContainerInterface $c) {
@@ -65,7 +66,7 @@ return function (ContainerBuilder $containerBuilder) {
                 $_ENV['AUTHORIZER_API_URL'] ?? '',
                 $c->get(LoggerInterface::class)
             );
-        },        
+        },
         NotificationService::class => function (ContainerInterface $c) {
             return new HttpNotificationServiceAdapter(
                 $c->get(Client::class),
@@ -79,7 +80,7 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(LoggerInterface::class)
             );
         },
-        
+
         // Serviços de Domínio (Domain Services)
         TransactionManagementService::class => \DI\autowire(TransactionService::class),
         // Domain Services
@@ -94,14 +95,16 @@ return function (ContainerBuilder $containerBuilder) {
             return new WalletService(
                 $c->get(WalletRepository::class)
             );
-        },        TransactionService::class => function (ContainerInterface $c) {
+        },
+        TransactionService::class => function (ContainerInterface $c) {
             return new TransactionService(
                 $c->get(UserRepository::class),
                 $c->get(WalletRepository::class),
                 $c->get(TransactionRepository::class),
                 $c->get(PaymentAuthorizationGateway::class),
                 $c->get(NotificationService::class),
-                $c->get(DatabaseTransactionManager::class)
+                $c->get(DatabaseTransactionManager::class),
+                $c->get(LoggerInterface::class)
             );
         },
         // Actions
@@ -116,7 +119,8 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(LoggerInterface::class),
                 $c->get(WalletService::class)
             );
-        },        ExecuteTransactionAction::class => function (ContainerInterface $c) {
+        },
+        ExecuteTransactionAction::class => function (ContainerInterface $c) {
             return new ExecuteTransactionAction(
                 $c->get(LoggerInterface::class),
                 $c->get(TransactionManagementService::class)

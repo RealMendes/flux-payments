@@ -13,7 +13,7 @@ class CpfCnpjTest extends TestCase
     public function testValidCpfCreation(): void
     {
         $cpf = new CpfCnpj('11144477735'); // CPF válido
-        
+
         $this->assertEquals('11144477735', $cpf->getValue());
         $this->assertEquals('111.444.777-35', $cpf->getFormatted());
     }
@@ -21,7 +21,7 @@ class CpfCnpjTest extends TestCase
     public function testValidCnpjCreation(): void
     {
         $cnpj = new CpfCnpj('11222333000181'); // CNPJ válido
-        
+
         $this->assertEquals('11222333000181', $cnpj->getValue());
         $this->assertEquals('11.222.333/0001-81', $cnpj->getFormatted());
     }
@@ -29,13 +29,14 @@ class CpfCnpjTest extends TestCase
     public function testCpfToString(): void
     {
         $cpf = new CpfCnpj('11144477735');
-        
+
         $this->assertEquals('11144477735', (string) $cpf);
-    }    public function testInvalidCpfThrowsException(): void
+    }
+    public function testInvalidCpfThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('CPF inválido');
-        
+
         new CpfCnpj('12345678901'); // CPF inválido
     }
 
@@ -43,7 +44,7 @@ class CpfCnpjTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('CNPJ inválido');
-        
+
         new CpfCnpj('12345678000100'); // CNPJ inválido
     }
 
@@ -51,7 +52,7 @@ class CpfCnpjTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('CPF/CNPJ é obrigatório');
-        
+
         new CpfCnpj('');
     }
 
@@ -59,7 +60,7 @@ class CpfCnpjTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos');
-        
+
         new CpfCnpj('123'); // Muito curto
     }
 
@@ -68,7 +69,7 @@ class CpfCnpjTest extends TestCase
         $cpf1 = new CpfCnpj('11144477735');
         $cpf2 = new CpfCnpj('11144477735');
         $cpf3 = new CpfCnpj('11222333000181');
-        
+
         $this->assertTrue($cpf1->equals($cpf2));
         $this->assertFalse($cpf1->equals($cpf3));
     }
@@ -76,7 +77,7 @@ class CpfCnpjTest extends TestCase
     public function testFormattedCpfInput(): void
     {
         $cpf = new CpfCnpj('111.444.777-35');
-        
+
         $this->assertEquals('11144477735', $cpf->getValue());
         $this->assertEquals('111.444.777-35', $cpf->getFormatted());
     }
@@ -84,7 +85,7 @@ class CpfCnpjTest extends TestCase
     public function testFormattedCnpjInput(): void
     {
         $cnpj = new CpfCnpj('11.222.333/0001-81');
-        
+
         $this->assertEquals('11222333000181', $cnpj->getValue());
         $this->assertEquals('11.222.333/0001-81', $cnpj->getFormatted());
     }

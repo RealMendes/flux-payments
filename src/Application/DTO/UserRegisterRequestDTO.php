@@ -30,7 +30,8 @@ class UserRegisterRequestDTO
         $this->email = new Email($email);
         $this->password = new Password($password);
         $this->type = new UserType($type);
-    }    public function getFullName(): FullName
+    }
+    public function getFullName(): FullName
     {
         return $this->fullName;
     }

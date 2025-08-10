@@ -16,14 +16,17 @@ use App\Domain\Repositories\DatabaseTransactionManager;
 use App\Domain\Exceptions\UserNotFoundException;
 use App\Domain\Exceptions\UnauthorizedTransactionException;
 use App\Domain\Exceptions\InsufficientBalanceException;
+use Psr\Log\LoggerInterface;
 
 class TransactionService implements TransactionManagementService
-{    private UserRepository $userRepository;
+{
+    private UserRepository $userRepository;
     private WalletRepository $walletRepository;
     private TransactionRepository $transactionRepository;
     private PaymentAuthorizationGateway $authorizationGateway;
     private NotificationService $notificationService;
     private DatabaseTransactionManager $databaseTransactionManager;
+    private LoggerInterface $logger;
 
     public function __construct(
         UserRepository $userRepository,
@@ -31,39 +34,28 @@ class TransactionService implements TransactionManagementService
         TransactionRepository $transactionRepository,
         PaymentAuthorizationGateway $authorizationGateway,
         NotificationService $notificationService,
-        DatabaseTransactionManager $databaseTransactionManager
-    ) {        $this->userRepository = $userRepository;
+        DatabaseTransactionManager $databaseTransactionManager,
+        LoggerInterface $logger
+    ) {
+        $this->userRepository = $userRepository;
         $this->walletRepository = $walletRepository;
         $this->transactionRepository = $transactionRepository;
         $this->authorizationGateway = $authorizationGateway;
         $this->notificationService = $notificationService;
         $this->databaseTransactionManager = $databaseTransactionManager;
-    }    /**
+        $this->logger = $logger;
+    }
+
+    /**
      * Executa uma transação entre usuários
      *
      * @param TransactionRequestDTO $dto
      * @return Transaction
      * @throws \Exception
-     */    
+     */
     public function executeTransaction(TransactionRequestDTO $dto): Transaction
     {
         return $this->execute($dto);
-    }
-
-    /**
-     * Consulta o histórico de transações de um usuário
-     *
-     * @param int $userId ID do usuário
-     * @return Transaction[] Lista de transações
-     * @throws \Exception Se houver erro na consulta
-     */
-    public function getUserTransactionHistory(int $userId): array
-    {
-        try {
-            return $this->transactionRepository->findByUserId($userId);
-        } catch (\Exception $e) {
-            throw new \Exception('Erro ao consultar histórico de transações: ' . $e->getMessage());
-        }
     }
 
     /**
@@ -72,7 +64,7 @@ class TransactionService implements TransactionManagementService
      * @param TransactionRequestDTO $dto
      * @return Transaction
      * @throws \Exception
-     */    
+     */
     private function execute(TransactionRequestDTO $dto): Transaction
     {
         try {
@@ -100,14 +92,16 @@ class TransactionService implements TransactionManagementService
         if ($dto->getValue() <= 0) {
             throw UnauthorizedTransactionException::invalidTransactionAmount();
         }
-        
+
         if ($payerWallet->getBalance() < $dto->getValue()) {
             throw new InsufficientBalanceException($payerWallet->getBalance(), $dto->getValue());
-        }        $authorizationData = [
+        }
+        $authorizationData = [
             'payer' => $dto->getPayerId(),
             'payee' => $dto->getPayeeId(),
             'value' => $dto->getValue()
-        ];        try {
+        ];
+        try {
             $authorized = $this->authorizationGateway->authorizePayment($authorizationData);
             if (!$authorized) {
                 throw UnauthorizedTransactionException::externalServiceDenied();
@@ -141,7 +135,9 @@ class TransactionService implements TransactionManagementService
 
             return $savedTransaction;
         });
-    }    /**
+    }
+
+    /**
      * Envia notificação da transação
      *
      * @param User $payer
@@ -151,16 +147,18 @@ class TransactionService implements TransactionManagementService
     private function sendTransactionNotification(User $payer, User $payee, float $value): void
     {
         try {
-            // Usa o método específico para notificações de transação
             $this->notificationService->sendTransactionNotification(
                 $payer->getId(),
                 $payee->getId(),
                 $value
             );
-            
         } catch (\Exception $e) {
-            // Log do erro mas não interrompe o fluxo da transação
-            error_log('Falha ao enviar notificação da transação: ' . $e->getMessage());
+            $this->logger->error('Falha ao enviar notificação da transação', [
+                'payer_id' => $payer->getId(),
+                'payee_id' => $payee->getId(),
+                'value' => $value,
+                'error' => $e->getMessage()
+            ]);
         }
     }
 }

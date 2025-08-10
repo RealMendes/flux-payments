@@ -19,11 +19,11 @@ final class FullName
     public function __construct(string $fullName)
     {
         $normalizedName = $this->normalize($fullName);
-        
+
         if (!v::stringType()->notEmpty()->length(2, null)->validate($normalizedName)) {
             throw new InvalidArgumentException('Nome completo deve ter pelo menos 2 caracteres');
         }
-        
+
         $this->value = $normalizedName;
     }
 
@@ -41,11 +41,11 @@ final class FullName
     public function getLastName(): string
     {
         $parts = explode(' ', $this->value);
-        
+
         if (count($parts) === 1) {
             return '';
         }
-        
+
         return end($parts);
     }
 

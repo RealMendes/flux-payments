@@ -126,7 +126,7 @@ class UserRegisterRequestDTOTest extends TestCase
         );
 
         $hashedPassword = $dto->getPassword()->getHashed();
-        
+
         $this->assertNotEquals('senha123', $hashedPassword);
         $this->assertTrue(password_verify('senha123', $hashedPassword));
     }

@@ -39,7 +39,8 @@ class User implements JsonSerializable
         $this->type = $type;
         $this->createdAt = $createdAt ?? new DateTime();
         $this->updatedAt = $updatedAt ?? new DateTime();
-    }    public function getId(): ?int
+    }
+    public function getId(): ?int
     {
         return $this->id;
     }

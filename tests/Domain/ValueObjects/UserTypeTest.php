@@ -13,27 +13,28 @@ class UserTypeTest extends TestCase
     public function testValidCommonUserType(): void
     {
         $userType = new UserType('COMMON');
-        
+
         $this->assertEquals('COMMON', $userType->getValue());
     }
 
     public function testValidMerchantUserType(): void
     {
         $userType = new UserType('MERCHANT');
-        
+
         $this->assertEquals('MERCHANT', $userType->getValue());
     }
 
     public function testUserTypeToString(): void
     {
         $userType = new UserType('COMMON');
-        
+
         $this->assertEquals('COMMON', (string) $userType);
-    }    public function testInvalidUserTypeThrowsException(): void
+    }
+    public function testInvalidUserTypeThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Tipo deve ser COMMON ou MERCHANT');
-        
+
         new UserType('INVALID');
     }
 
@@ -41,21 +42,21 @@ class UserTypeTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Tipo deve ser COMMON ou MERCHANT');
-        
+
         new UserType('');
     }
 
     public function testLowercaseUserTypeIsNormalized(): void
     {
         $userType = new UserType('common');
-        
+
         $this->assertEquals('COMMON', $userType->getValue());
     }
 
     public function testMixedCaseUserTypeIsNormalized(): void
     {
         $userType = new UserType('Merchant');
-        
+
         $this->assertEquals('MERCHANT', $userType->getValue());
     }
 
@@ -64,15 +65,16 @@ class UserTypeTest extends TestCase
         $userType1 = new UserType('COMMON');
         $userType2 = new UserType('common');
         $userType3 = new UserType('MERCHANT');
-        
+
         $this->assertTrue($userType1->equals($userType2));
         $this->assertFalse($userType1->equals($userType3));
     }
 
     public function testIsCommon(): void
     {
-        $commonUser = new UserType('COMMON');        $merchantUser = new UserType('MERCHANT');
-        
+        $commonUser = new UserType('COMMON');
+        $merchantUser = new UserType('MERCHANT');
+
         $this->assertTrue($commonUser->isCommon());
         $this->assertFalse($merchantUser->isCommon());
     }
@@ -81,7 +83,7 @@ class UserTypeTest extends TestCase
     {
         $commonUser = new UserType('COMMON');
         $merchantUser = new UserType('MERCHANT');
-        
+
         $this->assertFalse($commonUser->isMerchant());
         $this->assertTrue($merchantUser->isMerchant());
     }

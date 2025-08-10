@@ -27,11 +27,11 @@ final class UserType
     public function __construct(string $type)
     {
         $normalizedType = $this->normalize($type);
-        
+
         if (!v::in(self::VALID_TYPES)->validate($normalizedType)) {
             throw new InvalidArgumentException('Tipo deve ser COMMON ou MERCHANT');
         }
-        
+
         $this->value = $normalizedType;
     }
 

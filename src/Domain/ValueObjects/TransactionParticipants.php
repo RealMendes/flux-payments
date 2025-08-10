@@ -38,8 +38,8 @@ final class TransactionParticipants
 
     public function equals(TransactionParticipants $other): bool
     {
-        return $this->payerId->equals($other->payerId) && 
-               $this->payeeId->equals($other->payeeId);
+        return $this->payerId->equals($other->payerId) &&
+            $this->payeeId->equals($other->payeeId);
     }
 
     public function isPayerSameAs(UserId $userId): bool

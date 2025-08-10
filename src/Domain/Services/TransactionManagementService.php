@@ -23,13 +23,4 @@ interface TransactionManagementService
      * @throws \Exception Se houver erro no processamento
      */
     public function executeTransaction(TransactionRequestDTO $dto): Transaction;
-
-    /**
-     * Consulta o histórico de transações de um usuário
-     *
-     * @param int $userId ID do usuário
-     * @return Transaction[] Lista de transações
-     * @throws \Exception Se houver erro na consulta
-     */
-    public function getUserTransactionHistory(int $userId): array;
 }

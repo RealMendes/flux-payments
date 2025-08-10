@@ -27,7 +27,7 @@ class GetBalanceAction extends Action
     {
         try {
             $userId = (int) $this->resolveArg('user_id', $args);
-            
+
             if ($userId <= 0) {
                 throw new \InvalidArgumentException('ID do usuário inválido');
             }
@@ -40,7 +40,6 @@ class GetBalanceAction extends Action
                 'message' => 'Saldo consultado com sucesso',
                 'data' => $responseDto->toArray()
             ]);
-
         } catch (\InvalidArgumentException $e) {
             $this->logger->warning('Erro de validação na consulta de saldo', [
                 'user_id' => $userId ?? null,
@@ -53,7 +52,6 @@ class GetBalanceAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (UserNotFoundException $e) {
             $this->logger->warning('Tentativa de consulta de saldo para usuário inexistente', [
                 'user_id' => $userId ?? null,
@@ -66,7 +64,6 @@ class GetBalanceAction extends Action
             ));
 
             return $this->respond($response, $payload);
-
         } catch (\Exception $e) {
             $this->logger->error('Erro interno na consulta de saldo', [
                 'user_id' => $userId ?? null,

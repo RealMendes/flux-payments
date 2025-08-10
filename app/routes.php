@@ -19,14 +19,15 @@ return function (App $app) {
     $app->get('/', function (Request $request, Response $response) {
         $response->getBody()->write('Hello world! Flux API is running.');
         return $response;
-    }); 
-        $app->group('/api/v1', function (Group $group) {
+    });
+    $app->group('/api/v1', function (Group $group) {
         // Rotas de usuários
         $group->post('/users', RegisterUserAction::class);
-        
+
         // Rotas de carteiras
         $group->get('/wallets/{user_id}/balance', GetBalanceAction::class);
-          // Rotas de transações
+
+        // Rotas de transações
         $group->post('/transaction', ExecuteTransactionAction::class);
     });
 };

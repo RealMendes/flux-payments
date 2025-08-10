@@ -18,7 +18,8 @@ use Slim\Psr7\Uri;
 
 class ExecuteTransactionActionTest extends TestCase
 {
-    use ProphecyTrait;    private ObjectProphecy $transactionManagementServiceProphecy;
+    use ProphecyTrait;
+    private ObjectProphecy $transactionManagementServiceProphecy;
     private ObjectProphecy $loggerProphecy;
 
     protected function setUp(): void
@@ -58,7 +59,7 @@ class ExecuteTransactionActionTest extends TestCase
     {
         $json = json_encode($data);
         $stream = (new StreamFactory())->createStream($json);
-        
+
         return new SlimRequest(
             $method,
             new Uri('', '', 80, $path),

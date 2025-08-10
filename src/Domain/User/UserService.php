@@ -35,10 +35,11 @@ class UserService
      * @return User
      * @throws UserAlreadyExistsException
      * @throws \Exception
-     */    public function registerUser(UserRegisterRequestDTO $dto): User
+     */
+    public function registerUser(UserRegisterRequestDTO $dto): User
     {
         $this->validateUserUniqueness($dto->getEmail(), $dto->getCpfCnpj());
-        
+
         $hashedPassword = $dto->getPassword()->getHashed();
 
         $user = new User(
@@ -52,7 +53,7 @@ class UserService
 
         try {
             $savedUser = $this->userRepository->save($user);
-            
+
             if ($savedUser->getId() === null) {
                 throw new \Exception('Erro ao salvar usuário - ID não gerado');
             }
@@ -66,12 +67,11 @@ class UserService
             $this->walletRepository->save($wallet);
 
             return $savedUser;
-
         } catch (\Exception $e) {
             throw new \Exception('Erro ao registrar usuário: ' . $e->getMessage());
         }
-    }    
-    
+    }
+
     /**
      * @param string $email
      * @return User|null
@@ -96,7 +96,9 @@ class UserService
         } catch (UserNotFoundException $e) {
             return null;
         }
-    }    /**
+    }
+
+    /**
      * Valida se um usuário já existe no sistema
      *
      * @param Email $email
@@ -113,7 +115,7 @@ class UserService
             throw UserAlreadyExistsException::byCpfCnpj($cpfCnpj->getValue());
         }
     }
-    
+
     /**
      * Verifica se existe um usuário com o email informado
      *

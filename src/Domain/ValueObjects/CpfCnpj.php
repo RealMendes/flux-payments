@@ -23,13 +23,13 @@ final class CpfCnpj
     public function __construct(string $cpfCnpj)
     {
         $cleanValue = $this->clean($cpfCnpj);
-        
+
         if (empty($cleanValue)) {
             throw new InvalidArgumentException('CPF/CNPJ é obrigatório');
         }
 
         $length = strlen($cleanValue);
-        
+
         if ($length === 11) {
             if (!v::cpf()->validate($cleanValue)) {
                 throw new InvalidArgumentException('CPF inválido');
@@ -43,7 +43,7 @@ final class CpfCnpj
         } else {
             throw new InvalidArgumentException('CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos');
         }
-        
+
         $this->value = $cleanValue;
     }
 
@@ -75,17 +75,17 @@ final class CpfCnpj
     public function getFormatted(): string
     {
         if ($this->isCpf()) {
-            return substr($this->value, 0, 3) . '.' . 
-                   substr($this->value, 3, 3) . '.' . 
-                   substr($this->value, 6, 3) . '-' . 
-                   substr($this->value, 9, 2);
+            return substr($this->value, 0, 3) . '.' .
+                substr($this->value, 3, 3) . '.' .
+                substr($this->value, 6, 3) . '-' .
+                substr($this->value, 9, 2);
         }
-        
-        return substr($this->value, 0, 2) . '.' . 
-               substr($this->value, 2, 3) . '.' . 
-               substr($this->value, 5, 3) . '/' . 
-               substr($this->value, 8, 4) . '-' . 
-               substr($this->value, 12, 2);
+
+        return substr($this->value, 0, 2) . '.' .
+            substr($this->value, 2, 3) . '.' .
+            substr($this->value, 5, 3) . '/' .
+            substr($this->value, 8, 4) . '-' .
+            substr($this->value, 12, 2);
     }
 
     public function equals(CpfCnpj $other): bool

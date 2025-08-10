@@ -17,7 +17,7 @@ class InsufficientBalanceException extends DomainException
                 $requiredAmount
             );
         }
-        
+
         parent::__construct($message, 400);
     }
 }
