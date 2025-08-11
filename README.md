@@ -27,25 +27,28 @@ Sistema de pagamentos simplificado desenvolvido em PHP usando Slim Framework (Sl
 
 ## 🏗️ Arquitetura
 
-O projeto segue uma arquitetura limpa (Clean Architecture) com separação de responsabilidades:
+O projeto segue uma arquitetura limpa (Clean Architecture) + DDD.
 
 ```
 src/
-├── Application/           # Camada de Aplicação
-│   ├── Actions/          # Controladores/Endpoints
-│   ├── DTO/              # Data Transfer Objects
-│   ├── Handlers/         # Manipuladores de eventos
-│   └── Middleware/       # Middlewares da aplicação
-├── Domain/               # Camada de Domínio
-│   ├── User/             # Agregado de Usuário
-│   ├── Wallet/           # Agregado de Carteira
-│   ├── Transaction/      # Agregado de Transação
-│   ├── ValueObjects/     # Value Objects do domínio
-│   ├── Services/         # Interfaces de serviços de domínio
-│   └── Exceptions/       # Exceções de domínio
-└── Infrastructure/       # Camada de Infraestrutura
-    ├── Database/         # Repositórios e conexão
-    └── Adapters/         # Adaptadores para serviços externos
+├── Application/
+│   ├── Actions/
+│   ├── DTO/
+│   ├── Handlers/
+│   ├── Middleware/
+│   └── ResponseEmitter/
+├── Domain/
+│   ├── User/
+│   ├── Wallet/
+│   ├── Transaction/
+│   ├── ValueObjects/
+│   ├── Gateways/
+│   ├── Repositories/
+│   ├── Exceptions/
+├── Infrastructure/
+│   ├── Database/
+│   └── Adapters/
+
 ```
 
 ## 🚀 Rotas da API
