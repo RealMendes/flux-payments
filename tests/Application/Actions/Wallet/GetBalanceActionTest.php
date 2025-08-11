@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Wallet;
 
 use App\Application\Actions\Wallet\GetBalanceAction;
-use App\Domain\Wallet\WalletService;
+use App\Domain\Wallet\WalletManagementService;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -25,7 +25,7 @@ class GetBalanceActionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->walletServiceProphecy = $this->prophesize(WalletService::class);
+        $this->walletServiceProphecy = $this->prophesize(WalletManagementService::class);
         $this->loggerProphecy = $this->prophesize(LoggerInterface::class);
     }
 

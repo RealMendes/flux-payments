@@ -6,7 +6,7 @@ namespace App\Domain\Wallet;
 
 use App\Domain\Exceptions\UserNotFoundException;
 
-class WalletService
+class WalletService implements WalletManagementService
 {
     private WalletRepository $walletRepository;
 

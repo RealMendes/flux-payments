@@ -7,7 +7,7 @@ namespace App\Application\Actions\Wallet;
 use App\Application\Actions\Action;
 use App\Application\Actions\ActionPayload;
 use App\Application\DTO\WalletBalanceResponseDTO;
-use App\Domain\Wallet\WalletService;
+use App\Domain\Wallet\WalletManagementService; // updated
 use App\Domain\Exceptions\UserNotFoundException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -15,9 +15,9 @@ use Psr\Log\LoggerInterface;
 
 class GetBalanceAction extends Action
 {
-    private WalletService $walletService;
+    private WalletManagementService $walletService; // updated
 
-    public function __construct(LoggerInterface $logger, WalletService $walletService)
+    public function __construct(LoggerInterface $logger, WalletManagementService $walletService) // updated
     {
         parent::__construct($logger);
         $this->walletService = $walletService;

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\User;
 
 use App\Application\Actions\User\RegisterUserAction;
-use App\Domain\User\UserService;
+use App\Domain\User\UserManagementService;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -20,12 +20,12 @@ class RegisterUserActionTest extends TestCase
 {
     use ProphecyTrait;
 
-    private ObjectProphecy $userServiceProphecy;
+    private ObjectProphecy $userServiceProphecy; // keeps name
     private ObjectProphecy $loggerProphecy;
 
     protected function setUp(): void
     {
-        $this->userServiceProphecy = $this->prophesize(UserService::class);
+        $this->userServiceProphecy = $this->prophesize(UserManagementService::class); // updated prophecy target
         $this->loggerProphecy = $this->prophesize(LoggerInterface::class);
     }
 

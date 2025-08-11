@@ -12,10 +12,9 @@ use App\Domain\Wallet\WalletService;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Transaction\TransactionService;
 use App\Domain\Transaction\TransactionRepository;
-use App\Domain\Services\TransactionManagementService;
+use App\Domain\Transaction\TransactionManagementService;
 use App\Domain\Gateways\PaymentAuthorizationGateway;
-use App\Domain\Services\NotificationService;
-use App\Domain\Repositories\DatabaseTransactionManager;
+use App\Domain\Gateways\NotificationGateway;
 use App\Infrastructure\Adapters\ExternalPaymentAuthorizationAdapter;
 use App\Infrastructure\Adapters\HttpNotificationServiceAdapter;
 use App\Infrastructure\Adapters\DatabaseTransactionManagerAdapter;
@@ -27,6 +26,9 @@ use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
+use App\Domain\Repositories\DatabaseTransactionManager;
+use App\Domain\User\UserManagementService;
+use App\Domain\Wallet\WalletManagementService;
 
 return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
@@ -67,7 +69,7 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(LoggerInterface::class)
             );
         },
-        NotificationService::class => function (ContainerInterface $c) {
+        NotificationGateway::class => function (ContainerInterface $c) {
             return new HttpNotificationServiceAdapter(
                 $c->get(Client::class),
                 $_ENV['NOTIFICATION_API_URL'] ?? '',
@@ -90,19 +92,21 @@ return function (ContainerBuilder $containerBuilder) {
                 $c->get(WalletRepository::class)
             );
         },
+        UserManagementService::class => \DI\get(UserService::class), // alias
 
         WalletService::class => function (ContainerInterface $c) {
             return new WalletService(
                 $c->get(WalletRepository::class)
             );
         },
+        WalletManagementService::class => \DI\get(WalletService::class), // alias
         TransactionService::class => function (ContainerInterface $c) {
             return new TransactionService(
                 $c->get(UserRepository::class),
                 $c->get(WalletRepository::class),
                 $c->get(TransactionRepository::class),
                 $c->get(PaymentAuthorizationGateway::class),
-                $c->get(NotificationService::class),
+                $c->get(NotificationGateway::class),
                 $c->get(DatabaseTransactionManager::class),
                 $c->get(LoggerInterface::class)
             );
@@ -111,13 +115,13 @@ return function (ContainerBuilder $containerBuilder) {
         RegisterUserAction::class => function (ContainerInterface $c) {
             return new RegisterUserAction(
                 $c->get(LoggerInterface::class),
-                $c->get(UserService::class)
+                $c->get(UserManagementService::class) // updated
             );
         },
         GetBalanceAction::class => function (ContainerInterface $c) {
             return new GetBalanceAction(
                 $c->get(LoggerInterface::class),
-                $c->get(WalletService::class)
+                $c->get(WalletManagementService::class) // updated
             );
         },
         ExecuteTransactionAction::class => function (ContainerInterface $c) {

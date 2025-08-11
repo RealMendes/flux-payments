@@ -9,9 +9,9 @@ use App\Domain\User\User;
 use App\Domain\User\UserRepository;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Wallet\WalletNotFoundException;
-use App\Domain\Services\TransactionManagementService;
+use App\Domain\Transaction\TransactionManagementService;
 use App\Domain\Gateways\PaymentAuthorizationGateway;
-use App\Domain\Services\NotificationService;
+use App\Domain\Gateways\NotificationGateway;
 use App\Domain\Repositories\DatabaseTransactionManager;
 use App\Domain\Exceptions\UserNotFoundException;
 use App\Domain\Exceptions\UnauthorizedTransactionException;
@@ -24,7 +24,7 @@ class TransactionService implements TransactionManagementService
     private WalletRepository $walletRepository;
     private TransactionRepository $transactionRepository;
     private PaymentAuthorizationGateway $authorizationGateway;
-    private NotificationService $notificationService;
+    private NotificationGateway $notificationService;
     private DatabaseTransactionManager $databaseTransactionManager;
     private LoggerInterface $logger;
 
@@ -33,7 +33,7 @@ class TransactionService implements TransactionManagementService
         WalletRepository $walletRepository,
         TransactionRepository $transactionRepository,
         PaymentAuthorizationGateway $authorizationGateway,
-        NotificationService $notificationService,
+        NotificationGateway $notificationService,
         DatabaseTransactionManager $databaseTransactionManager,
         LoggerInterface $logger
     ) {

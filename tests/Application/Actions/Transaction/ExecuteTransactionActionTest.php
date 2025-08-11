@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests\Application\Actions\Transaction;
 
 use App\Application\Actions\Transaction\ExecuteTransactionAction;
-use App\Domain\Services\TransactionManagementService;
+use App\Domain\Transaction\TransactionManagementService;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;

@@ -7,15 +7,12 @@ namespace App\Domain\User;
 use App\Application\DTO\UserRegisterRequestDTO;
 use App\Domain\ValueObjects\Email;
 use App\Domain\ValueObjects\CpfCnpj;
-use App\Domain\ValueObjects\FullName;
-use App\Domain\ValueObjects\Password;
-use App\Domain\ValueObjects\UserType;
 use App\Domain\Wallet\Wallet;
 use App\Domain\Wallet\WalletRepository;
 use App\Domain\Exceptions\UserAlreadyExistsException;
 use App\Domain\User\UserNotFoundException;
 
-class UserService
+class UserService implements UserManagementService
 {
     private UserRepository $userRepository;
     private WalletRepository $walletRepository;
@@ -72,11 +69,7 @@ class UserService
         }
     }
 
-    /**
-     * @param string $email
-     * @return User|null
-     */
-    public function findUserByEmail(string $email): ?User
+    private function findUserByEmail(string $email): ?User
     {
         try {
             return $this->userRepository->findByEmail($email);
@@ -85,11 +78,7 @@ class UserService
         }
     }
 
-    /**
-     * @param string $cpfCnpj
-     * @return User|null
-     */
-    public function findUserByCpfCnpj(string $cpfCnpj): ?User
+    private function findUserByCpfCnpj(string $cpfCnpj): ?User
     {
         try {
             return $this->userRepository->findByCpfCnpj($cpfCnpj);

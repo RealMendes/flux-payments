@@ -7,7 +7,7 @@ namespace App\Application\Actions\Transaction;
 use App\Application\Actions\Action;
 use App\Application\Actions\ActionPayload;
 use App\Application\DTO\TransactionRequestDTO;
-use App\Domain\Services\TransactionManagementService;
+use App\Domain\Transaction\TransactionManagementService;
 use App\Domain\Exceptions\UserNotFoundException;
 use App\Domain\Exceptions\UnauthorizedTransactionException;
 use App\Domain\Exceptions\InsufficientBalanceException;

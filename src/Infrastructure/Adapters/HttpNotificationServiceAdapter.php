@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Infrastructure\Adapters;
 
-use App\Domain\Services\NotificationService;
+use App\Domain\Gateways\NotificationGateway; // altered
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Exception\RequestException;
@@ -13,9 +13,9 @@ use Psr\Log\LoggerInterface;
 /**
  * Adaptador para Serviço de Notificações via HTTP
  * 
- * Implementa o serviço de notificações usando comunicação HTTP externa
+ * Implementa o gateway de notificações usando comunicação HTTP externa
  */
-class HttpNotificationServiceAdapter implements NotificationService
+class HttpNotificationServiceAdapter implements NotificationGateway // changed implements
 {
     private Client $httpClient;
     private string $notificationUrl;

@@ -7,7 +7,7 @@ namespace App\Application\Actions\User;
 use App\Application\Actions\Action;
 use App\Application\Actions\ActionPayload;
 use App\Application\DTO\UserRegisterRequestDTO;
-use App\Domain\User\UserService;
+use App\Domain\User\UserManagementService;
 use App\Domain\Exceptions\UserAlreadyExistsException;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -15,9 +15,9 @@ use Psr\Log\LoggerInterface;
 
 class RegisterUserAction extends Action
 {
-    private UserService $userService;
+    private UserManagementService $userService;
 
-    public function __construct(LoggerInterface $logger, UserService $userService)
+    public function __construct(LoggerInterface $logger, UserManagementService $userService)
     {
         parent::__construct($logger);
         $this->userService = $userService;
