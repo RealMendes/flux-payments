@@ -91,7 +91,7 @@ docker exec -it flux-payments-app composer install
 ### Executar testes
 
 ```bash
-docker exec -it flux-payments-app composer test
+docker-compose exec php vendor/bin/phpunit tests/ --verbose
 
 ```
 
